@@ -84,6 +84,18 @@
                     </div>
                 </div>
 
+                <!-- Mostrar Resultados -->
+                <div class="mb-4">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" name="show_results" id="show_results"
+                               value="1" {{ old('show_results', $survey->show_results) ? 'checked' : '' }}>
+                        <label class="form-check-label fw-semibold" for="show_results">
+                            <i class="bi bi-bar-chart"></i> Mostrar resultados después de votar
+                        </label>
+                    </div>
+                    <small class="text-muted ms-4">Si está activado, los usuarios verán los resultados en tiempo real después de votar.</small>
+                </div>
+
                 <hr class="my-4">
 
                 <!-- Preguntas -->

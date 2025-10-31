@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Survey;
+use App\Models\SurveyToken;
 use App\Models\Vote;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -10,7 +11,7 @@ use Illuminate\Support\Str;
 
 class SurveyController extends Controller
 {
-    public function show($slug)
+    public function show(Request $request, $slug)
     {
         // Buscar la encuesta sin filtrar por is_active primero
         $survey = Survey::where('slug', $slug)
@@ -35,7 +36,7 @@ class SurveyController extends Controller
         }
 
         // Verificar si ya votó (solo por fingerprint para permitir múltiples usuarios en la misma red)
-        $fingerprint = request()->cookie('survey_fingerprint');
+        $fingerprint = $request->cookie('survey_fingerprint');
 
         $hasVoted = false;
         if ($fingerprint) {
@@ -49,7 +50,10 @@ class SurveyController extends Controller
             return redirect()->route('surveys.thanks', $survey->slug);
         }
 
-        return view('surveys.show', compact('survey', 'hasVoted'));
+        // Obtener token si existe en la URL
+        $token = $request->query('token');
+
+        return view('surveys.show', compact('survey', 'hasVoted', 'token'));
     }
 
     public function vote(Request $request, $slug)
@@ -66,6 +70,7 @@ class SurveyController extends Controller
             'answers' => 'required|array|min:1|max:50',
             'answers.*' => 'required|exists:question_options,id',
             'fingerprint' => 'required|string|max:100',
+            'token' => 'nullable|string|max:100',
             'device_data' => 'nullable|array',
             'device_data.user_agent' => 'nullable|string|max:500',
             'device_data.platform' => 'nullable|string|max:100',
@@ -90,84 +95,41 @@ class SurveyController extends Controller
         $ipAddress = $request->ip();
         $fingerprint = $request->input('fingerprint') ?? Str::random(40);
         $deviceData = $request->input('device_data', []);
+        $tokenString = $request->input('token');
 
         // ===================================================================
-        // SISTEMA ULTRA-REFORZADO DE DETECCIÓN DE FRAUDE
+        // VALIDACIÓN DE TOKEN (si existe)
         // ===================================================================
+        $tokenRecord = null;
+        $isValidToken = false;
 
-        // 1. VERIFICACIÓN POR FINGERPRINT EXACTO (Prioridad máxima)
+        if ($tokenString) {
+            $tokenRecord = SurveyToken::where('token', $tokenString)
+                ->where('survey_id', $survey->id)
+                ->first();
+
+            if ($tokenRecord) {
+                $tokenRecord->incrementAttempt();
+
+                if ($tokenRecord->isValid()) {
+                    $isValidToken = true;
+                }
+            }
+        }
+
+        // ===================================================================
+        // SISTEMA DE DETECCIÓN DE FRAUDE - SOLO POR FINGERPRINT
+        // ===================================================================
+        // Nota: NO bloqueamos por IP para permitir múltiples votantes en la misma red
+        // (oficinas, universidades, familias con WiFi compartido, etc.)
+
+        // VERIFICACIÓN POR FINGERPRINT EXACTO (Única validación)
         $exactMatch = Vote::where('survey_id', $survey->id)
             ->where('fingerprint', $fingerprint)
             ->exists();
 
         if ($exactMatch) {
             return back()->with('error', 'Ya has votado en esta encuesta. Solo se permite un voto por dispositivo.');
-        }
-
-        // 2. VERIFICACIÓN POR IP + CARACTERÍSTICAS DEL DISPOSITIVO (Ultra estricto)
-        $votesFromSameIP = Vote::where('survey_id', $survey->id)
-            ->where('ip_address', $ipAddress)
-            ->get();
-
-        if ($votesFromSameIP->isNotEmpty()) {
-            $currentUserAgent = $deviceData['user_agent'] ?? '';
-            $currentPlatform = $deviceData['platform'] ?? '';
-            $currentResolution = $deviceData['screen_resolution'] ?? '';
-            $currentCPU = $deviceData['hardware_concurrency'] ?? 0;
-
-            foreach ($votesFromSameIP as $vote) {
-                $deviceSimilarity = 0;
-
-                // User agent similar (mismo navegador/versión)
-                if ($vote->user_agent && $currentUserAgent) {
-                    similar_text($vote->user_agent, $currentUserAgent, $percent);
-                    if ($percent > 95) $deviceSimilarity += 50; // Casi idéntico
-                    elseif ($percent > 85) $deviceSimilarity += 40; // Muy similar
-                    elseif ($percent > 70) $deviceSimilarity += 25; // Similar
-                }
-
-                // Misma plataforma (Windows, Mac, Linux, Android, iOS)
-                if ($vote->platform == $currentPlatform && !empty($currentPlatform)) {
-                    $deviceSimilarity += 20;
-                }
-
-                // Misma resolución de pantalla (muy específico del dispositivo)
-                if ($vote->screen_resolution == $currentResolution && !empty($currentResolution)) {
-                    $deviceSimilarity += 25;
-                }
-
-                // Mismo número de núcleos CPU (característico del procesador)
-                if ($vote->hardware_concurrency == $currentCPU && $currentCPU > 0) {
-                    $deviceSimilarity += 20;
-                }
-
-                // CRITERIO MÁS ESTRICTO: Si el dispositivo es muy similar (>60%), BLOQUEAR
-                // Esto significa que aunque use incógnito o borre cookies, si las características
-                // del hardware son las mismas, se detecta como el mismo dispositivo
-                if ($deviceSimilarity > 60) {
-                    return back()->with('error',
-                        'Ya se ha registrado un voto desde este dispositivo. ' .
-                        'Solo se permite un voto por dispositivo, independientemente del navegador o modo de navegación utilizado. ' .
-                        'Si consideras que esto es un error, contacta al administrador.'
-                    );
-                }
-            }
-        }
-
-        // 3. VERIFICACIÓN ADICIONAL: Bloqueo por características únicas del dispositivo
-        // Aunque tenga IP diferente, si el fingerprint tiene características muy específicas
-        $fingerprintPrefix = substr($fingerprint, 0, 20); // Primeros 20 caracteres del hash
-
-        $similarFingerprints = Vote::where('survey_id', $survey->id)
-            ->where('fingerprint', 'LIKE', $fingerprintPrefix . '%')
-            ->where('fingerprint', '!=', $fingerprint)
-            ->count();
-
-        if ($similarFingerprints > 0) {
-            return back()->with('error',
-                'Se ha detectado un patrón similar a un voto previo desde este dispositivo. ' .
-                'Por seguridad, no se permite votar nuevamente.'
-            );
         }
 
         try {
@@ -187,8 +149,18 @@ class SurveyController extends Controller
                 ]);
             }
 
+            // Si hay un token válido, marcarlo como usado
+            if ($tokenRecord && $isValidToken) {
+                $tokenRecord->markAsUsed(
+                    $fingerprint,
+                    $ipAddress,
+                    $request->userAgent() ?? ''
+                );
+            }
+
             DB::commit();
 
+            // SIEMPRE mostrar mensaje de éxito al usuario
             $response = redirect()->route('surveys.thanks', $survey->slug)
                 ->with('success', '¡Gracias por tu participación!');
 
@@ -223,48 +195,54 @@ class SurveyController extends Controller
             return view('surveys.inactive', compact('survey'));
         }
 
-        // Calcular estadísticas generales
-        $totalVotes = Vote::where('survey_id', $survey->id)
-            ->distinct('fingerprint')
-            ->count('fingerprint');
-
-        // Si no hay votos por fingerprint, contar por IP
-        if ($totalVotes == 0) {
-            $totalVotes = Vote::where('survey_id', $survey->id)
-                ->distinct('ip_address')
-                ->count('ip_address');
-        }
-
-        // Preparar datos para los gráficos
+        // Verificar si se deben mostrar resultados
+        $showResults = $survey->show_results;
+        $totalVotes = 0;
         $statistics = [];
-        foreach ($survey->questions as $question) {
-            $questionStats = [
-                'question' => $question->question_text,
-                'type' => $question->question_type,
-                'options' => [],
-                'total_responses' => 0
-            ];
 
-            $totalQuestionVotes = $question->options->sum('votes_count');
-            $questionStats['total_responses'] = $totalQuestionVotes;
+        if ($showResults) {
+            // Calcular estadísticas generales
+            $totalVotes = Vote::where('survey_id', $survey->id)
+                ->distinct('fingerprint')
+                ->count('fingerprint');
 
-            foreach ($question->options as $option) {
-                $percentage = $totalQuestionVotes > 0
-                    ? round(($option->votes_count / $totalQuestionVotes) * 100, 1)
-                    : 0;
-
-                $questionStats['options'][] = [
-                    'text' => $option->option_text,
-                    'votes' => $option->votes_count,
-                    'percentage' => $percentage,
-                    'color' => $option->color ?? null
-                ];
+            // Si no hay votos por fingerprint, contar por IP
+            if ($totalVotes == 0) {
+                $totalVotes = Vote::where('survey_id', $survey->id)
+                    ->distinct('ip_address')
+                    ->count('ip_address');
             }
 
-            $statistics[] = $questionStats;
+            // Preparar datos para los gráficos
+            foreach ($survey->questions as $question) {
+                $questionStats = [
+                    'question' => $question->question_text,
+                    'type' => $question->question_type,
+                    'options' => [],
+                    'total_responses' => 0
+                ];
+
+                $totalQuestionVotes = $question->options->sum('votes_count');
+                $questionStats['total_responses'] = $totalQuestionVotes;
+
+                foreach ($question->options as $option) {
+                    $percentage = $totalQuestionVotes > 0
+                        ? round(($option->votes_count / $totalQuestionVotes) * 100, 1)
+                        : 0;
+
+                    $questionStats['options'][] = [
+                        'text' => $option->option_text,
+                        'votes' => $option->votes_count,
+                        'percentage' => $percentage,
+                        'color' => $option->color ?? null
+                    ];
+                }
+
+                $statistics[] = $questionStats;
+            }
         }
 
-        return view('surveys.thanks', compact('survey', 'totalVotes', 'statistics'));
+        return view('surveys.thanks', compact('survey', 'totalVotes', 'statistics', 'showResults'));
     }
 
     public function finished($slug)

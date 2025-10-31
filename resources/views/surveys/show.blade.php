@@ -74,6 +74,10 @@
                                 @csrf
                                 <input type="hidden" name="fingerprint" id="fingerprint">
 
+                                @if(isset($token) && $token)
+                                    <input type="hidden" name="token" value="{{ $token }}">
+                                @endif
+
                                 <!-- Datos del dispositivo para detección inteligente de fraude -->
                                 <input type="hidden" name="device_data[user_agent]" id="device_user_agent">
                                 <input type="hidden" name="device_data[platform]" id="device_platform">

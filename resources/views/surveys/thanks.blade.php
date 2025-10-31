@@ -83,6 +83,7 @@
                             @endif
                         </div>
 
+                        @if($showResults)
                         <!-- Resultados en Tiempo Real -->
                         <div class="results-section">
                             <h3 class="fw-bold text-dark mb-4 text-center">
@@ -175,12 +176,26 @@
                                     <div>
                                         <h6 class="fw-bold mb-2">Tu privacidad es importante</h6>
                                         <p class="mb-0 small">
-                                            Tu voto es completamente anónimo. No almacenamos ningún dato personal. 
+                                            Tu voto es completamente anónimo. No almacenamos ningún dato personal.
                                         </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        @else
+                        <!-- Mensaje cuando no se muestran resultados -->
+                        <div class="alert alert-success border-0 shadow-sm" role="alert" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);">
+                            <div class="d-flex align-items-start gap-3">
+                                <i class="bi bi-info-circle-fill text-success" style="font-size: 1.5rem;"></i>
+                                <div>
+                                    <h6 class="fw-bold mb-2">Voto registrado exitosamente</h6>
+                                    <p class="mb-0">
+                                        Tu voto ha sido registrado correctamente. Los resultados de esta encuesta no están disponibles públicamente.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                     </div>
 
                     <!-- Footer -->
@@ -747,6 +762,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Crear gráficos de pastel para cada pregunta - MEJORADO PARA WEB
+    @if($showResults)
     const chartData = @json($statistics);
 
     // Colores vibrantes y profesionales para WEB
@@ -908,6 +924,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    @endif
 });
 </script>
 @endsection

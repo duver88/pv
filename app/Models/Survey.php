@@ -15,6 +15,7 @@ class Survey extends Model
         'slug',
         'is_active',
         'is_finished',
+        'show_results',
         'published_at',
         'finished_at',
         'views_count',
@@ -23,6 +24,7 @@ class Survey extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'is_finished' => 'boolean',
+        'show_results' => 'boolean',
         'published_at' => 'datetime',
         'finished_at' => 'datetime',
     ];
@@ -48,6 +50,11 @@ class Survey extends Model
     public function votes()
     {
         return $this->hasMany(Vote::class);
+    }
+
+    public function tokens()
+    {
+        return $this->hasMany(SurveyToken::class);
     }
 
     // Métodos útiles

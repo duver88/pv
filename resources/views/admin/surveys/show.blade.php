@@ -20,6 +20,9 @@
                 <a href="{{ route('admin.surveys.edit', $survey) }}" class="btn btn-primary">
                     <i class="bi bi-pencil"></i> <span class="d-none d-md-inline">Editar</span>
                 </a>
+                <a href="{{ route('admin.surveys.tokens.index', $survey) }}" class="btn btn-info">
+                    <i class="bi bi-key-fill"></i> <span class="d-none d-md-inline">Tokens</span>
+                </a>
                 <a href="{{ route('admin.surveys.votes.edit', $survey) }}" class="btn btn-warning">
                     <i class="bi bi-pencil-square"></i> <span class="d-none d-md-inline">Editar Votos</span>
                 </a>
@@ -184,13 +187,31 @@
     </div>
 
     <!-- Link para compartir -->
-    <div class="alert alert-info d-flex align-items-center flex-wrap gap-2 mb-4" role="alert">
+    <div class="alert alert-info d-flex align-items-center flex-wrap gap-2 mb-3" role="alert">
         <i class="bi bi-info-circle-fill"></i>
         <div class="flex-grow-1">
-            <strong>Link para compartir:</strong>
+            <strong>Link público (sin tokens):</strong>
             <code class="ms-2 d-inline-block text-break">{{ url('/survey/' . $survey->slug) }}</code>
         </div>
         <button class="btn btn-sm btn-primary" onclick="copyToClipboard('{{ url('/survey/' . $survey->slug) }}')">
+            <i class="bi bi-clipboard"></i> Copiar
+        </button>
+    </div>
+
+    <!-- Link con generación automática de tokens -->
+    <div class="alert alert-success d-flex align-items-center flex-wrap gap-2 mb-4" role="alert">
+        <i class="bi bi-key-fill"></i>
+        <div class="flex-grow-1">
+            <strong>Link con Tokens Automáticos (recomendado para Ads):</strong>
+            <code class="ms-2 d-inline-block text-break">{{ url('/t/' . $survey->slug) }}</code>
+            <div class="mt-2">
+                <small class="text-muted">
+                    <i class="bi bi-lightbulb"></i> Este link genera un token único para cada persona automáticamente.
+                    Puedes agregar: <code>?source=facebook-ads</code> o <code>?source=whatsapp&campaign_id=verano-2025</code>
+                </small>
+            </div>
+        </div>
+        <button class="btn btn-sm btn-success" onclick="copyToClipboard('{{ url('/t/' . $survey->slug) }}')">
             <i class="bi bi-clipboard"></i> Copiar
         </button>
     </div>
