@@ -51,9 +51,13 @@ class SurveyController extends Controller
             return redirect()->route('token.redirect', $publicSlug);
         }
 
-        // Si el token ya fue usado, redirigir a página de agradecimiento
+        // Si el token ya fue usado, incrementar intentos y redirigir a página de agradecimiento
         if ($tokenRecord->status === 'used') {
-            return redirect()->route('surveys.thanks', $survey->public_slug);
+            // Incrementar contador de intentos para tracking
+            $tokenRecord->incrementAttempt();
+
+            return redirect()->route('surveys.thanks', $survey->public_slug)
+                ->with('info', 'Este enlace ya fue utilizado anteriormente.');
         }
 
         // Verificar si ya votó (solo por fingerprint para permitir múltiples usuarios en la misma red)
