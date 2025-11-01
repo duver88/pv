@@ -102,6 +102,80 @@
         </div>
     </div>
 
+    <!-- Votos por Opción (Gráficos) -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary bg-opacity-10">
+            <h5 class="mb-0">
+                <i class="bi bi-graph-up-arrow text-primary"></i> Distribución de Votos por Opción
+            </h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-4">Visualiza qué opciones votaron los tokens de esta encuesta</p>
+
+            @if(count($votesByOption) > 0)
+                @foreach($votesByOption as $questionData)
+                    <div class="mb-5">
+                        <h6 class="fw-bold mb-3">{{ $questionData['question_text'] }}</h6>
+
+                        @php
+                            $totalVotes = collect($questionData['options'])->sum('votes');
+                        @endphp
+
+                        @if($totalVotes > 0)
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <!-- Gráfico de barras -->
+                                    @foreach($questionData['options'] as $option)
+                                        @php
+                                            $percentage = $totalVotes > 0 ? ($option['votes'] / $totalVotes) * 100 : 0;
+                                        @endphp
+                                        <div class="mb-3">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="fw-medium">{{ $option['option_text'] }}</span>
+                                                <span class="badge" style="background-color: {{ $option['color'] }}">
+                                                    {{ number_format($option['votes']) }} votos ({{ number_format($percentage, 1) }}%)
+                                                </span>
+                                            </div>
+                                            <div class="progress" style="height: 30px;">
+                                                <div class="progress-bar fw-bold text-white"
+                                                     role="progressbar"
+                                                     style="width: {{ $percentage }}%; background-color: {{ $option['color'] }};"
+                                                     aria-valuenow="{{ $percentage }}"
+                                                     aria-valuemin="0"
+                                                     aria-valuemax="100">
+                                                    @if($percentage > 5)
+                                                        {{ number_format($percentage, 1) }}%
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div class="col-md-4">
+                                    <!-- Gráfico circular con Canvas -->
+                                    <canvas id="pieChart{{ $loop->index }}" width="250" height="250"></canvas>
+                                </div>
+                            </div>
+                        @else
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> Esta pregunta aún no tiene votos con tokens.
+                            </div>
+                        @endif
+
+                        @if(!$loop->last)
+                            <hr class="my-4">
+                        @endif
+                    </div>
+                @endforeach
+            @else
+                <div class="text-center py-5">
+                    <i class="bi bi-bar-chart text-muted" style="font-size: 3rem;"></i>
+                    <p class="text-muted mt-3">No hay preguntas en esta encuesta.</p>
+                </div>
+            @endif
+        </div>
+    </div>
+
     <!-- Tokens Sospechosos (Múltiples Intentos) -->
     <div class="card shadow-sm mb-4 border-danger">
         <div class="card-header bg-danger bg-opacity-10">
@@ -280,4 +354,78 @@
         </div>
     </div>
 </div>
+
+<!-- Chart.js para gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+// Datos de los gráficos
+const votesData = @json($votesByOption);
+
+// Generar un gráfico circular para cada pregunta
+votesData.forEach((question, index) => {
+    const totalVotes = question.options.reduce((sum, opt) => sum + opt.votes, 0);
+
+    // Solo crear gráfico si hay votos
+    if (totalVotes > 0) {
+        const ctx = document.getElementById('pieChart' + index);
+
+        if (ctx) {
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: question.options.map(opt => opt.option_text),
+                    datasets: [{
+                        data: question.options.map(opt => opt.votes),
+                        backgroundColor: question.options.map(opt => opt.color),
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                font: {
+                                    size: 12
+                                },
+                                generateLabels: function(chart) {
+                                    const data = chart.data;
+                                    if (data.labels.length && data.datasets.length) {
+                                        return data.labels.map((label, i) => {
+                                            const value = data.datasets[0].data[i];
+                                            const percentage = ((value / totalVotes) * 100).toFixed(1);
+                                            return {
+                                                text: `${label}: ${value} (${percentage}%)`,
+                                                fillStyle: data.datasets[0].backgroundColor[i],
+                                                hidden: false,
+                                                index: i
+                                            };
+                                        });
+                                    }
+                                    return [];
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed;
+                                    const percentage = ((value / totalVotes) * 100).toFixed(1);
+                                    return `${label}: ${value} votos (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    }
+});
+</script>
 @endsection

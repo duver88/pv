@@ -134,11 +134,32 @@ class TokenController extends Controller
             ->limit(50)
             ->get();
 
+        // Obtener votos agrupados por opción (solo votos con tokens)
+        $votesByOption = [];
+        foreach ($survey->questions as $question) {
+            $questionData = [
+                'question_text' => $question->question_text,
+                'options' => []
+            ];
+
+            foreach ($question->options as $option) {
+                $voteCount = $option->votes()->whereNotNull('survey_token_id')->count();
+                $questionData['options'][] = [
+                    'option_text' => $option->option_text,
+                    'color' => $option->color ?? '#0d6efd',
+                    'votes' => $voteCount
+                ];
+            }
+
+            $votesByOption[] = $questionData;
+        }
+
         return view('admin.surveys.tokens.analytics', compact(
             'survey',
             'tokensBySource',
             'suspiciousTokens',
-            'recentActivity'
+            'recentActivity',
+            'votesByOption'
         ));
     }
 }
