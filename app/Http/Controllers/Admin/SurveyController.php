@@ -15,7 +15,10 @@ class SurveyController extends Controller
 {
     public function index()
     {
-        $surveys = Survey::withCount('votes')->latest()->get();
+        // Solo contar votos que tienen survey_token_id (votos válidos con tokens)
+        $surveys = Survey::withCount(['votes' => function ($query) {
+            $query->whereNotNull('survey_token_id');
+        }])->latest()->get();
         return view('admin.surveys.index', compact('surveys'));
     }
 
@@ -127,17 +130,17 @@ class SurveyController extends Controller
     {
         $survey->load(['questions.options.votes', 'votes']);
 
-        // Calcular estadísticas
-        $uniqueVoters = $survey->votes()->distinct('ip_address')->count();
-        $totalVotes = $survey->votes()->count();
+        // Calcular estadísticas - SOLO CONTAR VOTOS CON TOKENS
+        $uniqueVoters = $survey->votes()->whereNotNull('survey_token_id')->distinct('fingerprint')->count();
+        $totalVotes = $survey->votes()->whereNotNull('survey_token_id')->count();
 
         $questionStats = [];
         foreach ($survey->questions as $question) {
-            $questionVotes = $question->votes()->count();
+            $questionVotes = $question->votes()->whereNotNull('survey_token_id')->count();
             $options = [];
 
             foreach ($question->options as $option) {
-                $optionVotes = $option->votes()->count();
+                $optionVotes = $option->votes()->whereNotNull('survey_token_id')->count();
                 $percentage = $questionVotes > 0 ? round(($optionVotes / $questionVotes) * 100, 2) : 0;
 
                 $options[] = [

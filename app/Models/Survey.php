@@ -65,10 +65,10 @@ class Survey extends Model
         return $this->hasMany(SurveyToken::class);
     }
 
-    // Métodos útiles
+    // Métodos útiles - SOLO CONTAR VOTOS CON TOKENS
     public function getTotalVotesAttribute()
     {
-        return $this->votes()->distinct('ip_address')->count();
+        return $this->votes()->whereNotNull('survey_token_id')->distinct('fingerprint')->count();
     }
 
     // Incrementar contador de visitas
