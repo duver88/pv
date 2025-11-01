@@ -131,9 +131,13 @@ class SurveyController extends Controller
             ->where('survey_id', $survey->id)
             ->first();
 
+        // ===================================================================
+        // VALIDACIÓN PRINCIPAL: 1 TOKEN = 1 VOTO (sin importar el dispositivo)
+        // ===================================================================
         // Si el token no existe o ya fue usado, mostrar éxito pero NO contar el voto
         if (!$tokenRecord || !$tokenRecord->isValid()) {
             if ($tokenRecord) {
+                // Incrementar intentos para rastreo de actividad sospechosa
                 $tokenRecord->incrementAttempt();
             }
 
@@ -142,27 +146,8 @@ class SurveyController extends Controller
                 ->with('success', '¡Gracias por tu participación!');
         }
 
-        // Incrementar intentos del token
+        // TOKEN VÁLIDO - Incrementar intentos del token
         $tokenRecord->incrementAttempt();
-
-        // ===================================================================
-        // SISTEMA DE DETECCIÓN DE FRAUDE - SOLO POR FINGERPRINT
-        // ===================================================================
-        // Nota: NO bloqueamos por IP para permitir múltiples votantes en la misma red
-        // (oficinas, universidades, familias con WiFi compartido, etc.)
-
-        // VERIFICACIÓN POR FINGERPRINT EXACTO (Única validación)
-        $exactMatch = Vote::where('survey_id', $survey->id)
-            ->where('fingerprint', $fingerprint)
-            ->exists();
-
-        if ($exactMatch) {
-            // Marcar el token como usado aunque sea un intento de voto duplicado
-            $tokenRecord->markAsUsed($fingerprint, $request->userAgent() ?? '');
-
-            return redirect()->route('surveys.thanks', $survey->public_slug)
-                ->with('success', '¡Gracias por tu participación!');
-        }
 
         try {
             DB::beginTransaction();
