@@ -70,7 +70,7 @@
                             </div>
                         @else
                             <!-- Formulario de votación -->
-                            <form method="POST" action="{{ route('surveys.vote', $survey->slug) }}" id="voteForm">
+                            <form method="POST" action="{{ route('surveys.vote', $survey->public_slug) }}" id="voteForm">
                                 @csrf
                                 <input type="hidden" name="fingerprint" id="fingerprint">
 
@@ -424,7 +424,7 @@ function hashString(str) {
 // Verificar si ya votó y redirigir
 async function checkIfAlreadyVoted(fingerprint) {
     try {
-        const response = await fetch('{{ route('surveys.check-vote', $survey->slug) }}', {
+        const response = await fetch('{{ route('surveys.check-vote', $survey->public_slug) }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -437,7 +437,7 @@ async function checkIfAlreadyVoted(fingerprint) {
 
         if (data.has_voted) {
             // Redirigir a la página de resultados
-            window.location.href = '{{ route('surveys.thanks', $survey->slug) }}';
+            window.location.href = '{{ route('surveys.thanks', $survey->public_slug) }}';
         }
     } catch (error) {
         console.error('Error verificando voto:', error);
@@ -452,7 +452,7 @@ function validateBeforeSubmit(event) {
     if (surveyVoteCookie) {
         event.preventDefault();
         alert('Ya has votado en esta encuesta anteriormente. Solo se permite un voto por dispositivo.');
-        window.location.href = '{{ route('surveys.thanks', $survey->slug) }}';
+        window.location.href = '{{ route('surveys.thanks', $survey->public_slug) }}';
         return false;
     }
 
