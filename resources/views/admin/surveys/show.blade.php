@@ -14,7 +14,7 @@
                 @endif
             </div>
             <div class="btn-group flex-wrap" role="group">
-                <a href="{{ route('surveys.show', $survey->slug) }}" target="_blank" class="btn btn-success">
+                <a href="{{ url('/t/' . $survey->public_slug) }}" target="_blank" class="btn btn-success">
                     <i class="bi bi-link-45deg"></i> <span class="d-none d-md-inline">Ver Pública</span>
                 </a>
                 <a href="{{ route('admin.surveys.edit', $survey) }}" class="btn btn-primary">
@@ -33,7 +33,7 @@
                             <i class="bi bi-arrow-counterclockwise"></i> <span class="d-none d-md-inline">Reactivar</span>
                         </button>
                     </form>
-                    <a href="{{ route('surveys.finished', $survey->slug) }}" target="_blank" class="btn btn-dark">
+                    <a href="{{ route('surveys.finished', $survey->public_slug) }}" target="_blank" class="btn btn-dark">
                         <i class="bi bi-eye-fill"></i> <span class="d-none d-md-inline">Ver Resultados</span>
                     </a>
                 @else
@@ -187,23 +187,12 @@
     </div>
 
     <!-- Link para compartir -->
-    <div class="alert alert-info d-flex align-items-center flex-wrap gap-2 mb-3" role="alert">
-        <i class="bi bi-info-circle-fill"></i>
-        <div class="flex-grow-1">
-            <strong>Link público (sin tokens):</strong>
-            <code class="ms-2 d-inline-block text-break">{{ url('/survey/' . $survey->slug) }}</code>
-        </div>
-        <button class="btn btn-sm btn-primary" onclick="copyToClipboard('{{ url('/survey/' . $survey->slug) }}')">
-            <i class="bi bi-clipboard"></i> Copiar
-        </button>
-    </div>
-
-    <!-- Link con generación automática de tokens -->
+    <!-- Link con generación automática de tokens (ÚNICO VÁLIDO) -->
     <div class="alert alert-success d-flex align-items-center flex-wrap gap-2 mb-4" role="alert">
         <i class="bi bi-key-fill"></i>
         <div class="flex-grow-1">
-            <strong>Link con Tokens Automáticos (recomendado para Ads):</strong>
-            <code class="ms-2 d-inline-block text-break">{{ url('/t/' . $survey->slug) }}</code>
+            <strong>Link Público de la Encuesta:</strong>
+            <code class="ms-2 d-inline-block text-break">{{ url('/t/' . $survey->public_slug) }}</code>
             <div class="mt-2">
                 <small class="text-muted">
                     <i class="bi bi-lightbulb"></i> Este link genera un token único para cada persona automáticamente.
@@ -211,7 +200,7 @@
                 </small>
             </div>
         </div>
-        <button class="btn btn-sm btn-success" onclick="copyToClipboard('{{ url('/t/' . $survey->slug) }}')">
+        <button class="btn btn-sm btn-success" onclick="copyToClipboard('{{ url('/t/' . $survey->public_slug) }}')">
             <i class="bi bi-clipboard"></i> Copiar
         </button>
     </div>
@@ -278,7 +267,7 @@
                 <i class="bi bi-graph-down text-muted" style="font-size: 4rem;"></i>
                 <h5 class="mt-3 text-muted">Aún no hay votos</h5>
                 <p class="text-muted">Comparte el link de la encuesta para comenzar a recibir respuestas.</p>
-                <a href="{{ route('surveys.show', $survey->slug) }}" target="_blank" class="btn btn-primary mt-3">
+                <a href="{{ url('/t/' . $survey->public_slug) }}" target="_blank" class="btn btn-primary mt-3">
                     <i class="bi bi-link-45deg"></i> Ver Encuesta Pública
                 </a>
             </div>
