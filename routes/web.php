@@ -19,16 +19,16 @@ Route::post('/HZlflogiis', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Ruta de generación automática de tokens (/t/)
-Route::get('/t/{slug}', [TokenRedirectController::class, 'redirect'])->name('token.redirect');
+Route::get('/t/{publicSlug}', [TokenRedirectController::class, 'redirect'])->name('token.redirect');
 
-// Rutas públicas de encuestas
-Route::get('/survey/{slug}', [SurveyController::class, 'show'])->name('surveys.show');
-Route::post('/survey/{slug}/vote', [SurveyController::class, 'vote'])
+// Rutas públicas de encuestas (usando public_slug ofuscado)
+Route::get('/survey/{publicSlug}', [SurveyController::class, 'show'])->name('surveys.show');
+Route::post('/survey/{publicSlug}/vote', [SurveyController::class, 'vote'])
     ->middleware('prevent.duplicate.vote')
     ->name('surveys.vote');
-Route::get('/survey/{slug}/thanks', [SurveyController::class, 'thanks'])->name('surveys.thanks');
-Route::get('/survey/{slug}/finished', [SurveyController::class, 'finished'])->name('surveys.finished');
-Route::match(['get', 'post'], '/survey/{slug}/check-vote', [SurveyController::class, 'checkVote'])->name('surveys.check-vote');
+Route::get('/survey/{publicSlug}/thanks', [SurveyController::class, 'thanks'])->name('surveys.thanks');
+Route::get('/survey/{publicSlug}/finished', [SurveyController::class, 'finished'])->name('surveys.finished');
+Route::match(['get', 'post'], '/survey/{publicSlug}/check-vote', [SurveyController::class, 'checkVote'])->name('surveys.check-vote');
 
 // Rutas del administrador (protegidas)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {

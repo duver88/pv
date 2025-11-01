@@ -107,10 +107,10 @@
                         </label>
                         <div class="input-group">
                             <input type="text" class="form-control" readonly
-                                   value="{{ url('/t/' . $survey->slug) }}"
+                                   value="{{ url('/t/' . $survey->public_slug) }}"
                                    id="url-basic">
                             <button class="btn btn-outline-success" type="button"
-                                    onclick="copyToClipboard('{{ url('/t/' . $survey->slug) }}', 'url-basic-btn')">
+                                    onclick="copyToClipboard('{{ url('/t/' . $survey->public_slug) }}', 'url-basic-btn')">
                                 <i class="bi bi-clipboard"></i> <span id="url-basic-btn">Copiar</span>
                             </button>
                         </div>
@@ -123,10 +123,10 @@
                         </label>
                         <div class="input-group">
                             <input type="text" class="form-control" readonly
-                                   value="{{ url('/t/' . $survey->slug) }}?source=facebook-ads"
+                                   value="{{ url('/t/' . $survey->public_slug) }}?source=facebook-ads"
                                    id="url-facebook">
                             <button class="btn btn-outline-primary" type="button"
-                                    onclick="copyToClipboard('{{ url('/t/' . $survey->slug) }}?source=facebook-ads', 'url-facebook-btn')">
+                                    onclick="copyToClipboard('{{ url('/t/' . $survey->public_slug) }}?source=facebook-ads', 'url-facebook-btn')">
                                 <i class="bi bi-clipboard"></i> <span id="url-facebook-btn">Copiar</span>
                             </button>
                         </div>
@@ -139,10 +139,10 @@
                         </label>
                         <div class="input-group">
                             <input type="text" class="form-control" readonly
-                                   value="{{ url('/t/' . $survey->slug) }}?source=instagram-ads"
+                                   value="{{ url('/t/' . $survey->public_slug) }}?source=instagram-ads"
                                    id="url-instagram">
                             <button class="btn btn-outline-danger" type="button"
-                                    onclick="copyToClipboard('{{ url('/t/' . $survey->slug) }}?source=instagram-ads', 'url-instagram-btn')">
+                                    onclick="copyToClipboard('{{ url('/t/' . $survey->public_slug) }}?source=instagram-ads', 'url-instagram-btn')">
                                 <i class="bi bi-clipboard"></i> <span id="url-instagram-btn">Copiar</span>
                             </button>
                         </div>
@@ -155,10 +155,10 @@
                         </label>
                         <div class="input-group">
                             <input type="text" class="form-control" readonly
-                                   value="{{ url('/t/' . $survey->slug) }}?source=facebook-ads&campaign_id=mi-campana-2025"
+                                   value="{{ url('/t/' . $survey->public_slug) }}?source=facebook-ads&campaign_id=mi-campana-2025"
                                    id="url-campaign">
                             <button class="btn btn-outline-info" type="button"
-                                    onclick="copyToClipboard('{{ url('/t/' . $survey->slug) }}?source=facebook-ads&campaign_id=mi-campana-2025', 'url-campaign-btn')">
+                                    onclick="copyToClipboard('{{ url('/t/' . $survey->public_slug) }}?source=facebook-ads&campaign_id=mi-campana-2025', 'url-campaign-btn')">
                                 <i class="bi bi-clipboard"></i> <span id="url-campaign-btn">Copiar</span>
                             </button>
                         </div>

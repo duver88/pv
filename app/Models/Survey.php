@@ -13,6 +13,7 @@ class Survey extends Model
         'banner',
         'og_image',
         'slug',
+        'public_slug',
         'is_active',
         'is_finished',
         'show_results',
@@ -37,6 +38,13 @@ class Survey extends Model
         static::creating(function ($survey) {
             if (empty($survey->slug)) {
                 $survey->slug = Str::slug($survey->title) . '-' . Str::random(6);
+            }
+
+            // Generar public_slug ofuscado (12 caracteres aleatorios)
+            if (empty($survey->public_slug)) {
+                do {
+                    $survey->public_slug = Str::random(12);
+                } while (self::where('public_slug', $survey->public_slug)->exists());
             }
         });
     }

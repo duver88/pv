@@ -11,10 +11,10 @@ use Illuminate\Support\Str;
 
 class SurveyController extends Controller
 {
-    public function show(Request $request, $slug)
+    public function show(Request $request, $publicSlug)
     {
-        // Buscar la encuesta sin filtrar por is_active primero
-        $survey = Survey::where('slug', $slug)
+        // Buscar la encuesta por public_slug (ofuscado)
+        $survey = Survey::where('public_slug', $publicSlug)
             ->with('questions.options')
             ->firstOrFail();
 
@@ -27,7 +27,7 @@ class SurveyController extends Controller
 
         // Si la encuesta está terminada, redirigir a resultados finales
         if ($survey->is_finished) {
-            return redirect()->route('surveys.finished', $survey->slug);
+            return redirect()->route('surveys.finished', $survey->public_slug);
         }
 
         // Si la encuesta no está activa, mostrar mensaje
@@ -35,10 +35,10 @@ class SurveyController extends Controller
             return view('surveys.inactive', compact('survey'));
         }
 
-        // OBLIGAR EL USO DE TOKENS: Si no hay token en la URL, redirigir a /t/{slug}
+        // OBLIGAR EL USO DE TOKENS: Si no hay token en la URL, redirigir a /t/{publicSlug}
         $tokenString = $request->query('token');
         if (!$tokenString) {
-            return redirect()->route('token.redirect', $slug);
+            return redirect()->route('token.redirect', $publicSlug);
         }
 
         // Verificar que el token existe y obtener su estado
@@ -46,14 +46,14 @@ class SurveyController extends Controller
             ->where('survey_id', $survey->id)
             ->first();
 
-        // Si el token no existe, redirigir a /t/{slug} para generar uno nuevo
+        // Si el token no existe, redirigir a /t/{publicSlug} para generar uno nuevo
         if (!$tokenRecord) {
-            return redirect()->route('token.redirect', $slug);
+            return redirect()->route('token.redirect', $publicSlug);
         }
 
         // Si el token ya fue usado, redirigir a página de agradecimiento
         if ($tokenRecord->status === 'used') {
-            return redirect()->route('surveys.thanks', $survey->slug);
+            return redirect()->route('surveys.thanks', $survey->public_slug);
         }
 
         // Verificar si ya votó (solo por fingerprint para permitir múltiples usuarios en la misma red)
@@ -68,7 +68,7 @@ class SurveyController extends Controller
 
         // Si ya votó, redirigir a la página de agradecimiento con resultados
         if ($hasVoted) {
-            return redirect()->route('surveys.thanks', $survey->slug);
+            return redirect()->route('surveys.thanks', $survey->public_slug);
         }
 
         // Pasar el token a la vista
@@ -77,13 +77,13 @@ class SurveyController extends Controller
         return view('surveys.show', compact('survey', 'hasVoted', 'token'));
     }
 
-    public function vote(Request $request, $slug)
+    public function vote(Request $request, $publicSlug)
     {
-        $survey = Survey::where('slug', $slug)->firstOrFail();
+        $survey = Survey::where('public_slug', $publicSlug)->firstOrFail();
 
         // Verificar que la encuesta esté activa
         if (!$survey->is_active) {
-            return redirect()->route('surveys.show', $slug)
+            return redirect()->route('surveys.show', $publicSlug)
                 ->with('error', 'Esta encuesta no está disponible para votar en este momento.');
         }
 
@@ -119,24 +119,31 @@ class SurveyController extends Controller
         $tokenString = $request->input('token');
 
         // ===================================================================
-        // VALIDACIÓN DE TOKEN (si existe)
+        // VALIDACIÓN DE TOKEN OBLIGATORIA
         // ===================================================================
-        $tokenRecord = null;
-        $isValidToken = false;
+        if (!$tokenString) {
+            // SIEMPRE mostrar éxito para no revelar el problema
+            return redirect()->route('surveys.thanks', $survey->slug)
+                ->with('success', '¡Gracias por tu participación!');
+        }
 
-        if ($tokenString) {
-            $tokenRecord = SurveyToken::where('token', $tokenString)
-                ->where('survey_id', $survey->id)
-                ->first();
+        $tokenRecord = SurveyToken::where('token', $tokenString)
+            ->where('survey_id', $survey->id)
+            ->first();
 
+        // Si el token no existe o ya fue usado, mostrar éxito pero NO contar el voto
+        if (!$tokenRecord || !$tokenRecord->isValid()) {
             if ($tokenRecord) {
                 $tokenRecord->incrementAttempt();
-
-                if ($tokenRecord->isValid()) {
-                    $isValidToken = true;
-                }
             }
+
+            // SIEMPRE mostrar éxito para no revelar que el token es inválido
+            return redirect()->route('surveys.thanks', $survey->slug)
+                ->with('success', '¡Gracias por tu participación!');
         }
+
+        // Incrementar intentos del token
+        $tokenRecord->incrementAttempt();
 
         // ===================================================================
         // SISTEMA DE DETECCIÓN DE FRAUDE - SOLO POR FINGERPRINT
@@ -150,7 +157,11 @@ class SurveyController extends Controller
             ->exists();
 
         if ($exactMatch) {
-            return back()->with('error', 'Ya has votado en esta encuesta. Solo se permite un voto por dispositivo.');
+            // Marcar el token como usado aunque sea un intento de voto duplicado
+            $tokenRecord->markAsUsed($fingerprint, $request->userAgent() ?? '');
+
+            return redirect()->route('surveys.thanks', $survey->slug)
+                ->with('success', '¡Gracias por tu participación!');
         }
 
         try {
@@ -170,13 +181,11 @@ class SurveyController extends Controller
                 ]);
             }
 
-            // Si hay un token válido, marcarlo como usado
-            if ($tokenRecord && $isValidToken) {
-                $tokenRecord->markAsUsed(
-                    $fingerprint,
-                    $request->userAgent() ?? ''
-                );
-            }
+            // Marcar el token como usado (ya validamos que es válido arriba)
+            $tokenRecord->markAsUsed(
+                $fingerprint,
+                $request->userAgent() ?? ''
+            );
 
             DB::commit();
 
@@ -197,9 +206,9 @@ class SurveyController extends Controller
         }
     }
 
-    public function thanks($slug)
+    public function thanks($publicSlug)
     {
-        $survey = Survey::where('slug', $slug)
+        $survey = Survey::where('public_slug', $publicSlug)
             ->with(['questions.options' => function($query) {
                 $query->withCount('votes');
             }])
@@ -207,7 +216,7 @@ class SurveyController extends Controller
 
         // Si la encuesta está terminada, redirigir a la página de resultados finales
         if ($survey->is_finished) {
-            return redirect()->route('surveys.finished', $survey->slug);
+            return redirect()->route('surveys.finished', $survey->public_slug);
         }
 
         // Si la encuesta está despublicada/inactiva, mostrar página de inactiva
@@ -265,9 +274,9 @@ class SurveyController extends Controller
         return view('surveys.thanks', compact('survey', 'totalVotes', 'statistics', 'showResults'));
     }
 
-    public function finished($slug)
+    public function finished($publicSlug)
     {
-        $survey = Survey::where('slug', $slug)
+        $survey = Survey::where('public_slug', $publicSlug)
             ->where('is_finished', true)
             ->with(['questions.options' => function($query) {
                 $query->withCount('votes');
@@ -315,9 +324,9 @@ class SurveyController extends Controller
         return view('surveys.finished', compact('survey', 'uniqueVoters', 'totalVotes', 'statistics'));
     }
 
-    public function checkVote($slug)
+    public function checkVote($publicSlug)
     {
-        $survey = Survey::where('slug', $slug)->where('is_active', true)->firstOrFail();
+        $survey = Survey::where('public_slug', $publicSlug)->where('is_active', true)->firstOrFail();
 
         $fingerprint = request()->input('fingerprint');
 
