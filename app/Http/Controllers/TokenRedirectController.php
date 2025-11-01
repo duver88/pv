@@ -28,14 +28,12 @@ class TokenRedirectController extends Controller
                 ->lockForUpdate()
                 ->first();
 
-            // Si NO hay tokens disponibles, mostrar mensaje de encuesta no disponible
+            // Si NO hay tokens disponibles, mostrar página de encuesta no disponible
             if (!$token) {
                 DB::commit();
 
-                // Redirigir a la encuesta sin token con mensaje de no disponibilidad
-                return redirect()->route('surveys.show', [
-                    'publicSlug' => $publicSlug
-                ])->with('no_tokens', true);
+                // Redirigir a vista dedicada de encuesta no disponible
+                return view('surveys.unavailable');
             }
 
             // OPCIONAL: Actualizar información del token (source, campaign_id) si se proporcionan
