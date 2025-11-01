@@ -278,7 +278,7 @@
                                     <td>
                                         <code class="text-muted small">{{ Str::limit($token->token, 20) }}</code>
                                         @if($token->status === 'pending')
-                                            <button class="btn btn-sm btn-link p-0 ms-2" onclick="copyToClipboard('{{ url('/t/' . $survey->slug . '?token=' . $token->token) }}')" title="Copiar URL">
+                                            <button class="btn btn-sm btn-link p-0 ms-2" onclick="copyToClipboard('{{ url('/t/' . $survey->public_slug . '?token=' . $token->token) }}')" title="Copiar URL">
                                                 <i class="bi bi-clipboard"></i>
                                             </button>
                                         @endif

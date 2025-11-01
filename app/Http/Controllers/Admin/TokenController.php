@@ -82,7 +82,7 @@ class TokenController extends Controller
     {
         $tokens = $survey->tokens()->where('status', 'pending')->get();
 
-        $baseUrl = url("/t/{$survey->slug}");
+        $baseUrl = url("/t/{$survey->public_slug}");
 
         $content = $tokens->map(function ($token) use ($baseUrl) {
             return $baseUrl . '?token=' . $token->token;
@@ -90,7 +90,7 @@ class TokenController extends Controller
 
         return response($content)
             ->header('Content-Type', 'text/plain')
-            ->header('Content-Disposition', "attachment; filename=tokens-{$survey->slug}.txt");
+            ->header('Content-Disposition', "attachment; filename=tokens-{$survey->public_slug}.txt");
     }
 
     public function destroy(Survey $survey, SurveyToken $token)
