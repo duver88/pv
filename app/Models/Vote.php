@@ -8,6 +8,7 @@ class Vote extends Model
 {
     protected $fillable = [
         'survey_id',
+        'survey_token_id',
         'question_id',
         'question_option_id',
         'ip_address',
@@ -22,6 +23,11 @@ class Vote extends Model
     public function survey()
     {
         return $this->belongsTo(Survey::class);
+    }
+
+    public function token()
+    {
+        return $this->belongsTo(SurveyToken::class, 'survey_token_id');
     }
 
     public function question()

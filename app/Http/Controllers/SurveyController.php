@@ -123,7 +123,7 @@ class SurveyController extends Controller
         // ===================================================================
         if (!$tokenString) {
             // SIEMPRE mostrar éxito para no revelar el problema
-            return redirect()->route('surveys.thanks', $survey->slug)
+            return redirect()->route('surveys.thanks', $survey->public_slug)
                 ->with('success', '¡Gracias por tu participación!');
         }
 
@@ -138,7 +138,7 @@ class SurveyController extends Controller
             }
 
             // SIEMPRE mostrar éxito para no revelar que el token es inválido
-            return redirect()->route('surveys.thanks', $survey->slug)
+            return redirect()->route('surveys.thanks', $survey->public_slug)
                 ->with('success', '¡Gracias por tu participación!');
         }
 
@@ -160,7 +160,7 @@ class SurveyController extends Controller
             // Marcar el token como usado aunque sea un intento de voto duplicado
             $tokenRecord->markAsUsed($fingerprint, $request->userAgent() ?? '');
 
-            return redirect()->route('surveys.thanks', $survey->slug)
+            return redirect()->route('surveys.thanks', $survey->public_slug)
                 ->with('success', '¡Gracias por tu participación!');
         }
 
@@ -170,6 +170,7 @@ class SurveyController extends Controller
             foreach ($validated['answers'] as $questionId => $optionId) {
                 Vote::create([
                     'survey_id' => $survey->id,
+                    'survey_token_id' => $tokenRecord->id,
                     'question_id' => $questionId,
                     'question_option_id' => $optionId,
                     'ip_address' => $ipAddress,
@@ -190,7 +191,7 @@ class SurveyController extends Controller
             DB::commit();
 
             // SIEMPRE mostrar mensaje de éxito al usuario
-            $response = redirect()->route('surveys.thanks', $survey->slug)
+            $response = redirect()->route('surveys.thanks', $survey->public_slug)
                 ->with('success', '¡Gracias por tu participación!');
 
             // Establecer MÚLTIPLES cookies para máxima persistencia

@@ -53,7 +53,7 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('surveys.show', $survey->slug) }}" target="_blank"
+                                    <a href="{{ url('/t/' . $survey->public_slug) }}" target="_blank"
                                        class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-link-45deg"></i> Ver Encuesta
                                     </a>
