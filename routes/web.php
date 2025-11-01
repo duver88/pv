@@ -50,6 +50,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/surveys/{survey}/tokens/generate', [TokenController::class, 'generate'])->name('surveys.tokens.generate');
     Route::get('/surveys/{survey}/tokens/export', [TokenController::class, 'export'])->name('surveys.tokens.export');
     Route::get('/surveys/{survey}/tokens/analytics', [TokenController::class, 'analytics'])->name('surveys.tokens.analytics');
+    Route::get('/surveys/{survey}/tokens/{token}', [TokenController::class, 'show'])->name('surveys.tokens.show');
     Route::delete('/surveys/{survey}/tokens/{token}', [TokenController::class, 'destroy'])->name('surveys.tokens.destroy');
     Route::post('/surveys/{survey}/tokens/bulk-delete', [TokenController::class, 'bulkDelete'])->name('surveys.tokens.bulk-delete');
 });

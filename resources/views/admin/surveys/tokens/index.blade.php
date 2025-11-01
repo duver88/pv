@@ -251,10 +251,61 @@
         </div>
     </div>
 
+    <!-- Filtros -->
+    <div class="modern-card mb-4">
+        <h5 class="mb-3 fw-bold" style="color: #1e293b;">
+            <i class="bi bi-funnel-fill" style="color: #667eea;"></i> Filtros
+        </h5>
+        <form method="GET" action="{{ route('admin.surveys.tokens.index', $survey) }}" id="filterForm">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label for="status" class="form-label fw-semibold">Estado</label>
+                    <select name="status" id="status" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                        <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>Todos</option>
+                        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pendientes</option>
+                        <option value="used" {{ request('status') == 'used' ? 'selected' : '' }}>Usados</option>
+                        <option value="expired" {{ request('status') == 'expired' ? 'selected' : '' }}>Expirados</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="source" class="form-label fw-semibold">Fuente</label>
+                    <select name="source" id="source" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                        <option value="all" {{ request('source') == 'all' ? 'selected' : '' }}>Todas</option>
+                        @foreach($sources as $source)
+                            <option value="{{ $source }}" {{ request('source') == $source ? 'selected' : '' }}>{{ $source }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="multiple_attempts" class="form-label fw-semibold">Intentos Múltiples</label>
+                    <select name="multiple_attempts" id="multiple_attempts" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                        <option value="0" {{ request('multiple_attempts') == '0' ? 'selected' : '' }}>Todos</option>
+                        <option value="1" {{ request('multiple_attempts') == '1' ? 'selected' : '' }}>Solo con intentos múltiples</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="sort_by" class="form-label fw-semibold">Ordenar por</label>
+                    <select name="sort_by" id="sort_by" class="form-select" onchange="document.getElementById('filterForm').submit()">
+                        <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Fecha creación</option>
+                        <option value="used_at" {{ request('sort_by') == 'used_at' ? 'selected' : '' }}>Fecha uso</option>
+                        <option value="vote_attempts" {{ request('sort_by') == 'vote_attempts' ? 'selected' : '' }}>Intentos de voto</option>
+                        <option value="last_attempt_at" {{ request('sort_by') == 'last_attempt_at' ? 'selected' : '' }}>Último intento</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mt-3">
+                <a href="{{ route('admin.surveys.tokens.index', $survey) }}" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-x-circle"></i> Limpiar filtros
+                </a>
+            </div>
+        </form>
+    </div>
+
     <!-- Tabla de Tokens -->
     <div class="modern-card">
         <h5 class="mb-4 fw-bold" style="color: #1e293b;">
             <i class="bi bi-list-ul" style="color: #667eea;"></i> Lista de Tokens
+            <span class="badge bg-secondary ms-2">{{ $tokens->total() }} resultados</span>
         </h5>
         <div>
             @if($tokens->count() > 0)
@@ -310,8 +361,12 @@
                                     </td>
                                     <td>
                                         @if($token->vote_attempts > 1)
-                                            <span class="badge bg-danger">
-                                                {{ $token->vote_attempts }} intentos
+                                            <span class="badge bg-danger" style="font-size: 0.875rem; padding: 0.5rem 0.75rem;">
+                                                <i class="bi bi-exclamation-triangle-fill"></i> {{ $token->vote_attempts }} intentos
+                                            </span>
+                                        @elseif($token->vote_attempts == 1)
+                                            <span class="badge bg-success">
+                                                <i class="bi bi-check-circle"></i> {{ $token->vote_attempts }}
                                             </span>
                                         @else
                                             <span class="text-muted">{{ $token->vote_attempts }}</span>
@@ -328,13 +383,18 @@
                                         <small class="text-muted">{{ $token->created_at->format('d/m/Y H:i') }}</small>
                                     </td>
                                     <td class="text-center">
-                                        <form action="{{ route('admin.surveys.tokens.destroy', [$survey, $token]) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar este token?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ route('admin.surveys.tokens.show', [$survey, $token]) }}" class="btn btn-sm btn-outline-primary" title="Ver detalles">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <form action="{{ route('admin.surveys.tokens.destroy', [$survey, $token]) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar este token?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Eliminar">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

@@ -9,11 +9,31 @@ use Illuminate\Http\Request;
 
 class TokenController extends Controller
 {
-    public function index(Survey $survey)
+    public function index(Request $request, Survey $survey)
     {
-        $tokens = $survey->tokens()
-            ->orderBy('created_at', 'desc')
-            ->paginate(50);
+        $query = $survey->tokens();
+
+        // Filtro por estado
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        // Filtro por fuente
+        if ($request->filled('source') && $request->source !== 'all') {
+            $query->where('source', $request->source);
+        }
+
+        // Filtro por intentos múltiples
+        if ($request->filled('multiple_attempts') && $request->multiple_attempts === '1') {
+            $query->where('vote_attempts', '>', 1);
+        }
+
+        // Ordenamiento
+        $sortBy = $request->get('sort_by', 'created_at');
+        $sortDir = $request->get('sort_dir', 'desc');
+        $query->orderBy($sortBy, $sortDir);
+
+        $tokens = $query->paginate(50)->withQueryString();
 
         $stats = [
             'total' => $survey->tokens()->count(),
@@ -23,7 +43,14 @@ class TokenController extends Controller
             'multiple_attempts' => $survey->tokens()->where('vote_attempts', '>', 1)->count(),
         ];
 
-        return view('admin.surveys.tokens.index', compact('survey', 'tokens', 'stats'));
+        // Obtener todas las fuentes únicas para el filtro
+        $sources = $survey->tokens()
+            ->select('source')
+            ->distinct()
+            ->whereNotNull('source')
+            ->pluck('source');
+
+        return view('admin.surveys.tokens.index', compact('survey', 'tokens', 'stats', 'sources'));
     }
 
     public function generate(Request $request, Survey $survey)
@@ -161,5 +188,26 @@ class TokenController extends Controller
             'recentActivity',
             'votesByOption'
         ));
+    }
+
+    public function show(Survey $survey, SurveyToken $token)
+    {
+        // Verificar que el token pertenece a la encuesta
+        if ($token->survey_id !== $survey->id) {
+            abort(404);
+        }
+
+        // Obtener todos los votos asociados a este token
+        $votes = \App\Models\Vote::where('survey_token_id', $token->id)
+            ->with(['question', 'option'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        // Agrupar votos por sesión (usando fingerprint y fecha cercana)
+        $voteAttempts = $votes->groupBy(function($vote) {
+            return $vote->created_at->format('Y-m-d H:i') . '_' . $vote->fingerprint;
+        });
+
+        return view('admin.surveys.tokens.show', compact('survey', 'token', 'votes', 'voteAttempts'));
     }
 }
