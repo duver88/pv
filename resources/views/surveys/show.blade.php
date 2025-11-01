@@ -56,7 +56,19 @@
                             </div>
                         @endif
 
-                        @if($hasVoted)
+                        @if(session('no_tokens'))
+                            <!-- No hay tokens disponibles -->
+                            <div class="text-center py-5">
+                                <div class="mb-4">
+                                    <i class="bi bi-exclamation-circle text-warning" style="font-size: 5rem;"></i>
+                                </div>
+                                <h2 class="h3 fw-bold text-dark mb-3">Encuesta No Disponible</h2>
+                                <p class="lead text-muted mb-4">Esta encuesta ha alcanzado su límite de participantes.</p>
+                                <p class="text-muted">
+                                    <i class="bi bi-info-circle"></i> No hay cupos disponibles en este momento.
+                                </p>
+                            </div>
+                        @elseif($hasVoted)
                             <!-- Ya votó -->
                             <div class="text-center py-5">
                                 <div class="mb-4">
