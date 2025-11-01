@@ -15,7 +15,22 @@ class TokenRedirectController extends Controller
         $survey = Survey::where('public_slug', $publicSlug)->firstOrFail();
 
         // ========================================================================
+        // VERIFICAR SI YA VIENE UN TOKEN EN LA URL
+        // ========================================================================
+        $tokenString = $request->query('token');
+
+        if ($tokenString) {
+            // Si viene un token en la URL, redirigir directamente a /survey/ con ese token
+            // NO generar un token nuevo
+            return redirect()->route('surveys.show', [
+                'publicSlug' => $publicSlug,
+                'token' => $tokenString
+            ]);
+        }
+
+        // ========================================================================
         // SISTEMA DE POOL DE TOKENS: Usar tokens pre-generados del pool
+        // Solo si NO viene un token en la URL
         // ========================================================================
 
         // Intentar asignar un token disponible del pool (con bloqueo para evitar condiciones de carrera)
