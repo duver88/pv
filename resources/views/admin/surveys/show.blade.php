@@ -3,51 +3,65 @@
 @section('title', 'Resultados - ' . $survey->title)
 
 @section('content')
-<div class="container-fluid px-3 px-lg-4 py-4">
+<div class="container-fluid px-0">
     <!-- Header Section -->
-    <div class="mb-4">
-        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
-            <div>
-                <h1 class="h2 fw-bold mb-2">{{ $survey->title }}</h1>
-                @if($survey->description)
-                    <p class="text-muted mb-0">{{ $survey->description }}</p>
-                @endif
-            </div>
-            <div class="btn-group flex-wrap" role="group">
-                <a href="{{ url('/t/' . $survey->public_slug) }}" target="_blank" class="btn btn-success">
-                    <i class="bi bi-link-45deg"></i> <span class="d-none d-md-inline">Ver Pública</span>
-                </a>
-                <a href="{{ route('admin.surveys.edit', $survey) }}" class="btn btn-primary">
-                    <i class="bi bi-pencil"></i> <span class="d-none d-md-inline">Editar</span>
-                </a>
-                <a href="{{ route('admin.surveys.tokens.index', $survey) }}" class="btn btn-info">
-                    <i class="bi bi-key-fill"></i> <span class="d-none d-md-inline">Tokens</span>
-                </a>
-                <a href="{{ route('admin.surveys.votes.edit', $survey) }}" class="btn btn-warning">
-                    <i class="bi bi-pencil-square"></i> <span class="d-none d-md-inline">Editar Votos</span>
-                </a>
-                @if($survey->is_finished)
-                    <form action="{{ route('admin.surveys.unfinish', $survey) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-info">
-                            <i class="bi bi-arrow-counterclockwise"></i> <span class="d-none d-md-inline">Reactivar</span>
-                        </button>
-                    </form>
-                    <a href="{{ route('surveys.finished', $survey->public_slug) }}" target="_blank" class="btn btn-dark">
-                        <i class="bi bi-eye-fill"></i> <span class="d-none d-md-inline">Ver Resultados</span>
-                    </a>
-                @else
-                    <button type="button" class="btn btn-dark" onclick="confirmFinish()">
-                        <i class="bi bi-check-circle"></i> <span class="d-none d-md-inline">Terminar</span>
+    <div class="mb-4 d-flex justify-content-between align-items-start flex-wrap gap-3">
+        <div>
+            <h1 class="h2 fw-bold mb-1" style="color: #1e293b;">
+                <i class="bi bi-bar-chart"></i> {{ $survey->title }}
+            </h1>
+            @if($survey->description)
+                <p class="text-muted mb-0">{{ $survey->description }}</p>
+            @endif
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url('/t/' . $survey->public_slug) }}" target="_blank"
+               class="btn btn-sm"
+               style="background: linear-gradient(135deg, rgba(17, 153, 142, 0.15) 0%, rgba(56, 239, 125, 0.15) 100%); color: #11998e; border: 1px solid rgba(17, 153, 142, 0.3); padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
+                <i class="bi bi-link-45deg"></i> <span class="d-none d-md-inline">Ver Pública</span>
+            </a>
+            <a href="{{ route('admin.surveys.edit', $survey) }}"
+               class="btn btn-sm"
+               style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
+                <i class="bi bi-pencil"></i> <span class="d-none d-md-inline">Editar</span>
+            </a>
+            <a href="{{ route('admin.surveys.tokens.index', $survey) }}"
+               class="btn btn-sm"
+               style="background: linear-gradient(135deg, rgba(79, 172, 254, 0.15) 0%, rgba(0, 242, 254, 0.15) 100%); color: #4facfe; border: 1px solid rgba(79, 172, 254, 0.3); padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
+                <i class="bi bi-key-fill"></i> <span class="d-none d-md-inline">Tokens</span>
+            </a>
+            <a href="{{ route('admin.surveys.votes.edit', $survey) }}"
+               class="btn btn-sm"
+               style="background: linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(245, 87, 108, 0.15) 100%); color: #f093fb; border: 1px solid rgba(240, 147, 251, 0.3); padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
+                <i class="bi bi-pencil-square"></i> <span class="d-none d-md-inline">Editar Votos</span>
+            </a>
+            @if($survey->is_finished)
+                <form action="{{ route('admin.surveys.unfinish', $survey) }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-sm"
+                            style="background: linear-gradient(135deg, rgba(79, 172, 254, 0.15) 0%, rgba(0, 242, 254, 0.15) 100%); color: #4facfe; border: 1px solid rgba(79, 172, 254, 0.3); padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
+                        <i class="bi bi-arrow-counterclockwise"></i> <span class="d-none d-md-inline">Reactivar</span>
                     </button>
-                @endif
-                <button type="button" class="btn btn-danger" onclick="confirmReset()">
-                    <i class="bi bi-arrow-clockwise"></i> <span class="d-none d-md-inline">Reset</span>
-                </button>
-                <a href="{{ route('admin.surveys.index') }}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline">Volver</span>
+                </form>
+                <a href="{{ route('surveys.finished', $survey->public_slug) }}" target="_blank"
+                   class="btn btn-sm"
+                   style="background: #f1f5f9; color: #64748b; border: none; padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
+                    <i class="bi bi-eye-fill"></i> <span class="d-none d-md-inline">Ver Resultados</span>
                 </a>
-            </div>
+            @else
+                <button type="button" class="btn btn-sm" onclick="confirmFinish()"
+                        style="background: #f1f5f9; color: #64748b; border: none; padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
+                    <i class="bi bi-check-circle"></i> <span class="d-none d-md-inline">Terminar</span>
+                </button>
+            @endif
+            <button type="button" class="btn btn-sm" onclick="confirmReset()"
+                    style="background: linear-gradient(135deg, rgba(238, 9, 121, 0.15) 0%, rgba(255, 106, 0, 0.15) 100%); color: #ee0979; border: 1px solid rgba(238, 9, 121, 0.3); padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
+                <i class="bi bi-arrow-clockwise"></i> <span class="d-none d-md-inline">Reset</span>
+            </button>
+            <a href="{{ route('admin.surveys.index') }}" class="btn btn-sm"
+               style="background: #f1f5f9; color: #64748b; border: none; padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
+                <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline">Volver</span>
+            </a>
         </div>
     </div>
 
@@ -55,15 +69,15 @@
     <div class="row g-4 mb-4">
         <!-- Lado Izquierdo: VISITAS -->
         <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0 fw-bold text-primary">
+            <div class="modern-card h-100">
+                <div style="border-bottom: 1px solid #e2e8f0; padding: 1.25rem;">
+                    <h5 class="mb-0 fw-bold" style="color: #667eea;">
                         <i class="bi bi-eye-fill"></i> Visitas Totales
                     </h5>
                 </div>
-                <div class="card-body p-4">
+                <div style="padding: 1.5rem;">
                     <div class="text-center mb-4">
-                        <div class="display-3 fw-bold text-primary mb-2">
+                        <div class="display-3 fw-bold mb-2" style="color: #667eea;">
                             {{ number_format($survey->views_count ?? 0) }}
                         </div>
                         <p class="text-muted mb-0">Personas han visto esta encuesta</p>
@@ -116,15 +130,15 @@
 
         <!-- Lado Derecho: VOTANTES -->
         <div class="col-lg-6">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-header bg-white border-bottom">
-                    <h5 class="mb-0 fw-bold text-success">
+            <div class="modern-card h-100">
+                <div style="border-bottom: 1px solid #e2e8f0; padding: 1.25rem;">
+                    <h5 class="mb-0 fw-bold" style="color: #11998e;">
                         <i class="bi bi-people-fill"></i> Votantes
                     </h5>
                 </div>
-                <div class="card-body p-4">
+                <div style="padding: 1.5rem;">
                     <div class="text-center mb-4">
-                        <div class="display-3 fw-bold text-success mb-2">
+                        <div class="display-3 fw-bold mb-2" style="color: #11998e;">
                             {{ number_format($uniqueVoters) }}
                         </div>
                         <p class="text-muted mb-0">Personas han completado la encuesta</p>
@@ -187,42 +201,44 @@
     </div>
 
     <!-- Link para compartir -->
-    <!-- Link con generación automática de tokens (ÚNICO VÁLIDO) -->
-    <div class="alert alert-success d-flex align-items-center flex-wrap gap-2 mb-4" role="alert">
-        <i class="bi bi-key-fill"></i>
-        <div class="flex-grow-1">
-            <strong>Link Público de la Encuesta:</strong>
-            <code class="ms-2 d-inline-block text-break">{{ url('/t/' . $survey->public_slug) }}</code>
-            <div class="mt-2">
-                <small class="text-muted">
-                    <i class="bi bi-lightbulb"></i> Este link genera un token único para cada persona automáticamente.
-                    Puedes agregar: <code>?source=facebook-ads</code> o <code>?source=whatsapp&campaign_id=verano-2025</code>
-                </small>
+    <div class="modern-card mb-4" style="background: linear-gradient(135deg, rgba(17, 153, 142, 0.05) 0%, rgba(56, 239, 125, 0.05) 100%); border: 1px solid rgba(17, 153, 142, 0.2);">
+        <div class="d-flex align-items-center flex-wrap gap-3" style="padding: 1.25rem;">
+            <i class="bi bi-key-fill" style="font-size: 1.5rem; color: #11998e;"></i>
+            <div class="flex-grow-1">
+                <strong style="color: #1e293b;">Link Público de la Encuesta:</strong>
+                <code class="ms-2 d-inline-block text-break" style="background: rgba(255, 255, 255, 0.7); padding: 0.25rem 0.5rem; border-radius: 4px; color: #667eea;">{{ url('/t/' . $survey->public_slug) }}</code>
+                <div class="mt-2">
+                    <small class="text-muted">
+                        <i class="bi bi-lightbulb"></i> Este link genera un token único para cada persona automáticamente.
+                        Puedes agregar: <code style="background: rgba(255, 255, 255, 0.7); padding: 0.125rem 0.375rem; border-radius: 4px;">?source=facebook-ads</code> o <code style="background: rgba(255, 255, 255, 0.7); padding: 0.125rem 0.375rem; border-radius: 4px;">?source=whatsapp&campaign_id=verano-2025</code>
+                    </small>
+                </div>
             </div>
+            <button class="btn btn-sm" onclick="copyToClipboard('{{ url('/t/' . $survey->public_slug) }}')"
+                    style="background: linear-gradient(135deg, rgba(17, 153, 142, 0.15) 0%, rgba(56, 239, 125, 0.15) 100%); color: #11998e; border: 1px solid rgba(17, 153, 142, 0.3); padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
+                <i class="bi bi-clipboard"></i> Copiar
+            </button>
         </div>
-        <button class="btn btn-sm btn-success" onclick="copyToClipboard('{{ url('/t/' . $survey->public_slug) }}')">
-            <i class="bi bi-clipboard"></i> Copiar
-        </button>
     </div>
 
     <!-- Resultados por pregunta -->
     @foreach($questionStats as $index => $stat)
-        <div class="card border-0 shadow-sm mb-4 question-card">
-            <div class="card-header bg-white border-bottom py-3">
+        <div class="modern-card mb-4 question-card">
+            <div style="border-bottom: 1px solid #e2e8f0; padding: 1.25rem;">
                 <div class="d-flex align-items-start gap-3">
-                    <span class="badge bg-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
-                          style="width: 40px; height: 40px; font-size: 1.1rem;">
+                    <span class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                          style="width: 40px; height: 40px; font-size: 1.1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-weight: 600;">
                         {{ $index + 1 }}
                     </span>
                     <div class="flex-grow-1">
-                        <h5 class="mb-2 fw-semibold">{{ $stat['question'] }}</h5>
+                        <h5 class="mb-2 fw-semibold" style="color: #1e293b;">{{ $stat['question'] }}</h5>
                         <small class="text-muted">
                             <i class="bi bi-graph-up"></i> Total de votos: <strong>{{ number_format($stat['total_votes']) }}</strong>
                         </small>
                     </div>
                 </div>
             </div>
-            <div class="card-body p-3 p-lg-4">
+            <div style="padding: 1.5rem;">
                 <div class="row">
                     <!-- Gráfico de pastel (solo en desktop) -->
                     <div class="col-lg-5 d-none d-lg-block mb-4 mb-lg-0">
@@ -236,20 +252,20 @@
                         @foreach($stat['options'] as $optIndex => $option)
                             <div class="option-stat mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <span class="fw-medium text-dark">{{ $option['text'] }}</span>
-                                    <span class="badge bg-primary rounded-pill">
+                                    <span class="fw-medium" style="color: #1e293b;">{{ $option['text'] }}</span>
+                                    <span class="badge rounded-pill" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%); color: #667eea; border: 1px solid rgba(102, 126, 234, 0.3); padding: 0.375rem 0.75rem; font-weight: 600;">
                                         {{ number_format($option['votes']) }} votos ({{ $option['percentage'] }}%)
                                     </span>
                                 </div>
-                                <div class="progress" style="height: 28px;">
-                                    <div class="progress-bar bg-primary bg-gradient position-relative"
+                                <div class="progress" style="height: 28px; background: #f1f5f9; border-radius: 8px;">
+                                    <div class="progress-bar position-relative"
                                          role="progressbar"
-                                         style="width: {{ $option['percentage'] }}%"
+                                         style="width: {{ $option['percentage'] }}%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px;"
                                          aria-valuenow="{{ $option['percentage'] }}"
                                          aria-valuemin="0"
                                          aria-valuemax="100">
                                         @if($option['percentage'] > 10)
-                                            <strong>{{ $option['percentage'] }}%</strong>
+                                            <strong style="color: white;">{{ $option['percentage'] }}%</strong>
                                         @endif
                                     </div>
                                 </div>
@@ -262,12 +278,16 @@
     @endforeach
 
     @if(count($questionStats) === 0)
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center py-5">
-                <i class="bi bi-graph-down text-muted" style="font-size: 4rem;"></i>
-                <h5 class="mt-3 text-muted">Aún no hay votos</h5>
-                <p class="text-muted">Comparte el link de la encuesta para comenzar a recibir respuestas.</p>
-                <a href="{{ url('/t/' . $survey->public_slug) }}" target="_blank" class="btn btn-primary mt-3">
+        <div class="modern-card">
+            <div class="text-center py-5" style="padding: 3rem 1rem;">
+                <div class="mb-4">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border-radius: 20px; display: inline-flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-graph-down" style="font-size: 2.5rem; color: #667eea;"></i>
+                    </div>
+                </div>
+                <h5 class="fw-bold mb-2" style="color: #1e293b;">Aún no hay votos</h5>
+                <p class="text-muted mb-4">Comparte el link de la encuesta para comenzar a recibir respuestas.</p>
+                <a href="{{ url('/t/' . $survey->public_slug) }}" target="_blank" class="btn btn-gradient-primary">
                     <i class="bi bi-link-45deg"></i> Ver Encuesta Pública
                 </a>
             </div>
@@ -283,14 +303,14 @@
 
 <style>
 /* Animaciones y efectos */
-.card {
+.modern-card {
     animation: fadeInUp 0.5s ease-out;
     transition: all 0.3s ease;
 }
 
-.card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important;
+.modern-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important;
 }
 
 .question-card {
@@ -299,7 +319,8 @@
 }
 
 .question-card:hover {
-    box-shadow: 0 8px 20px rgba(0,0,0,0.12) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08) !important;
 }
 
 .option-stat {
@@ -309,7 +330,7 @@
 }
 
 .option-stat:hover {
-    background: rgba(13, 110, 253, 0.05);
+    background: rgba(102, 126, 234, 0.05);
     transform: translateX(5px);
 }
 
@@ -327,7 +348,7 @@
 
 .desglose-box .bg-white:hover {
     transform: scale(1.02);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 @keyframes fadeInUp {
@@ -367,10 +388,6 @@
         font-size: 2.5rem !important;
     }
 
-    .card-body {
-        padding: 1.5rem !important;
-    }
-
     .desglose-box {
         padding: 1rem !important;
     }
@@ -381,15 +398,6 @@
 }
 
 @media (max-width: 576px) {
-    .btn-group {
-        width: 100%;
-    }
-
-    .btn-group .btn {
-        font-size: 0.85rem;
-        padding: 0.4rem 0.6rem;
-    }
-
     .display-3 {
         font-size: 2rem !important;
     }

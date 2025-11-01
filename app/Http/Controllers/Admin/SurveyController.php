@@ -130,17 +130,17 @@ class SurveyController extends Controller
     {
         $survey->load(['questions.options.votes', 'votes']);
 
-        // Calcular estadísticas - SOLO CONTAR VOTOS CON TOKENS
-        $uniqueVoters = $survey->votes()->whereNotNull('survey_token_id')->distinct('fingerprint')->count();
-        $totalVotes = $survey->votes()->whereNotNull('survey_token_id')->count();
+        // Calcular estadísticas - Solo contar votos válidos (con token o manuales)
+        $uniqueVoters = $survey->votes()->valid()->distinct('fingerprint')->count();
+        $totalVotes = $survey->votes()->valid()->count();
 
         $questionStats = [];
         foreach ($survey->questions as $question) {
-            $questionVotes = $question->votes()->whereNotNull('survey_token_id')->count();
+            $questionVotes = $question->votes()->valid()->count();
             $options = [];
 
             foreach ($question->options as $option) {
-                $optionVotes = $option->votes()->whereNotNull('survey_token_id')->count();
+                $optionVotes = $option->votes()->valid()->count();
                 $percentage = $questionVotes > 0 ? round(($optionVotes / $questionVotes) * 100, 2) : 0;
 
                 $options[] = [
@@ -191,6 +191,7 @@ class SurveyController extends Controller
                 'title' => $validated['title'],
                 'description' => $validated['description'] ?? null,
                 'is_active' => $request->boolean('is_active'),
+                'show_results' => $request->boolean('show_results'),
             ]);
 
             // Actualizar banner si existe
@@ -452,6 +453,7 @@ class SurveyController extends Controller
                             'fingerprint' => $fingerprint,
                             'user_agent' => 'Admin Manual Edit',
                             'platform' => 'Admin Panel',
+                            'is_manual' => true,
                         ]);
 
                         $optionData['votes_created']++;

@@ -17,7 +17,17 @@ class Vote extends Model
         'platform',
         'screen_resolution',
         'hardware_concurrency',
+        'is_manual',
     ];
+
+    // Scope para votos válidos (con token o manuales)
+    public function scopeValid($query)
+    {
+        return $query->where(function($q) {
+            $q->whereNotNull('survey_token_id')
+              ->orWhere('is_manual', true);
+        });
+    }
 
     // Relaciones
     public function survey()

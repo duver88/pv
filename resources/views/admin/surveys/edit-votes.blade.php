@@ -3,30 +3,29 @@
 @section('title', 'Editar Votos - ' . $survey->title)
 
 @section('content')
-<div class="container-fluid px-3 px-lg-4 py-4">
+<div class="container-fluid px-0">
     <!-- Header Section -->
     <div class="mb-4">
         <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
             <div>
-                <h1 class="h2 fw-bold mb-2">
+                <h1 class="h2 fw-bold mb-1" style="color: #1e293b;">
                     <i class="bi bi-pencil-square"></i> Editar Votos
                 </h1>
                 <p class="text-muted mb-0">{{ $survey->title }}</p>
             </div>
-            <div class="btn-group flex-wrap" role="group">
-                <a href="{{ route('admin.surveys.show', $survey) }}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline">Volver a Resultados</span>
-                </a>
-            </div>
+            <a href="{{ route('admin.surveys.show', $survey) }}" class="btn btn-sm"
+               style="background: #f1f5f9; color: #64748b; border: none; padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
+                <i class="bi bi-arrow-left"></i> <span class="d-none d-md-inline">Volver a Resultados</span>
+            </a>
         </div>
     </div>
 
     <!-- Alert de información -->
-    <div class="alert alert-info border-0 shadow-sm mb-4">
-        <div class="d-flex align-items-start">
-            <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+    <div class="modern-card mb-4" style="background: linear-gradient(135deg, rgba(79, 172, 254, 0.05) 0%, rgba(0, 242, 254, 0.05) 100%); border: 1px solid rgba(79, 172, 254, 0.2);">
+        <div class="d-flex align-items-start" style="padding: 1.25rem;">
+            <i class="bi bi-info-circle-fill fs-4 me-3" style="color: #4facfe;"></i>
             <div>
-                <h5 class="alert-heading mb-2">Instrucciones</h5>
+                <h5 class="mb-2 fw-bold" style="color: #1e293b;">Instrucciones</h5>
                 <ul class="mb-0 ps-3">
                     <li>Define cuántas <strong>personas únicas</strong> quieres que aparezcan como votantes</li>
                     <li>Ingresa el número de votos para cada opción de cada pregunta</li>
@@ -72,8 +71,8 @@
         @method('PUT')
 
         <!-- Control de Personas Únicas -->
-        <div class="card border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-            <div class="card-body p-4 text-white">
+        <div class="modern-card mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div style="padding: 1.5rem;" class="text-white">
                 <div class="row align-items-center">
                     <div class="col-md-6 mb-3 mb-md-0">
                         <h5 class="mb-2">
@@ -114,14 +113,14 @@
         </div>
 
         @foreach($votesData as $questionIndex => $question)
-            <div class="card border-0 shadow-sm mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">
+            <div class="modern-card mb-4">
+                <div style="border-bottom: 1px solid #e2e8f0; padding: 1.25rem; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);">
+                    <h5 class="mb-0 fw-bold" style="color: #667eea;">
                         <i class="bi bi-question-circle-fill"></i>
                         Pregunta {{ $questionIndex + 1 }}: {{ $question['question_text'] }}
                     </h5>
                 </div>
-                <div class="card-body p-4">
+                <div style="padding: 1.5rem;">
                     <div class="row g-3">
                         @foreach($question['options'] as $option)
                             <div class="col-md-6">
@@ -167,21 +166,23 @@
         @endforeach
 
         <!-- Botones de acción -->
-        <div class="card border-0 shadow-sm sticky-bottom bg-white">
-            <div class="card-body p-3">
+        <div class="modern-card sticky-bottom">
+            <div style="padding: 1.25rem;">
                 <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div class="text-muted">
                         <i class="bi bi-shield-check"></i>
                         Revisa los cambios antes de guardar
                     </div>
-                    <div class="btn-group" role="group">
-                        <a href="{{ route('admin.surveys.show', $survey) }}" class="btn btn-secondary">
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('admin.surveys.show', $survey) }}" class="btn btn-sm"
+                           style="background: #f1f5f9; color: #64748b; border: none; padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
                             <i class="bi bi-x-lg"></i> Cancelar
                         </a>
-                        <button type="button" class="btn btn-warning" onclick="resetForm()">
+                        <button type="button" class="btn btn-sm" onclick="resetForm()"
+                                style="background: linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(245, 87, 108, 0.15) 100%); color: #f093fb; border: 1px solid rgba(240, 147, 251, 0.3); padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
                             <i class="bi bi-arrow-counterclockwise"></i> Restablecer
                         </button>
-                        <button type="submit" class="btn btn-primary btn-lg">
+                        <button type="submit" class="btn btn-gradient-primary" style="padding: 0.5rem 1rem;">
                             <i class="bi bi-save"></i> Guardar Cambios
                         </button>
                     </div>

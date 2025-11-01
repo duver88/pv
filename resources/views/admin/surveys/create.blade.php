@@ -3,14 +3,16 @@
 @section('title', 'Crear Encuesta')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid px-0">
     <div class="mb-4">
-        <h1 class="h2 fw-bold">Crear Nueva Encuesta</h1>
-        <p class="text-muted">Completa el formulario para crear una encuesta</p>
+        <h1 class="h2 fw-bold mb-1" style="color: #1e293b;">
+            <i class="bi bi-plus-circle"></i> Crear Nueva Encuesta
+        </h1>
+        <p class="text-muted mb-0">Completa el formulario para crear una encuesta</p>
     </div>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-4">
+    <div class="modern-card">
+        <div style="padding: 1.5rem;">
             <form method="POST" action="{{ route('admin.surveys.store') }}" enctype="multipart/form-data" id="surveyForm">
                 @csrf
 
@@ -74,10 +76,11 @@
                 <!-- Preguntas -->
                 <div class="mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h5 class="mb-0 fw-semibold">
+                        <h5 class="mb-0 fw-bold" style="color: #1e293b;">
                             <i class="bi bi-question-circle"></i> Preguntas
                         </h5>
-                        <button type="button" onclick="addQuestion()" class="btn btn-success btn-sm">
+                        <button type="button" onclick="addQuestion()" class="btn btn-sm"
+                                style="background: linear-gradient(135deg, rgba(17, 153, 142, 0.15) 0%, rgba(56, 239, 125, 0.15) 100%); color: #11998e; border: 1px solid rgba(17, 153, 142, 0.3); padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
                             <i class="bi bi-plus-circle"></i> Agregar Pregunta
                         </button>
                     </div>
@@ -89,10 +92,11 @@
 
                 <!-- Botones de acción -->
                 <div class="d-flex gap-2 justify-content-end mt-4">
-                    <a href="{{ route('admin.surveys.index') }}" class="btn btn-secondary">
+                    <a href="{{ route('admin.surveys.index') }}" class="btn btn-sm"
+                       style="background: #f1f5f9; color: #64748b; border: none; padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
                         <i class="bi bi-x-circle"></i> Cancelar
                     </a>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-sm btn-gradient-primary">
                         <i class="bi bi-check-circle"></i> Crear Encuesta
                     </button>
                 </div>
@@ -107,14 +111,14 @@ let questionCount = 0;
 function addQuestion() {
     const container = document.getElementById('questionsContainer');
     const questionHtml = `
-        <div class="card mb-3 question-block" data-question="${questionCount}">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center">
-                <h6 class="mb-0 fw-semibold">Pregunta ${questionCount + 1}</h6>
-                <button type="button" onclick="removeQuestion(${questionCount})" class="btn btn-danger btn-sm">
+        <div class="modern-card mb-3 question-block" data-question="${questionCount}">
+            <div class="d-flex justify-content-between align-items-center" style="border-bottom: 1px solid #e2e8f0; padding: 1rem; background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);">
+                <h6 class="mb-0 fw-bold" style="color: #667eea;">Pregunta ${questionCount + 1}</h6>
+                <button type="button" onclick="removeQuestion(${questionCount})" class="btn btn-sm" style="background: linear-gradient(135deg, rgba(238, 9, 121, 0.15) 0%, rgba(255, 106, 0, 0.15) 100%); color: #ee0979; border: 1px solid rgba(238, 9, 121, 0.3); padding: 0.375rem 0.75rem; border-radius: 8px; font-weight: 500;">
                     <i class="bi bi-trash"></i> Eliminar
                 </button>
             </div>
-            <div class="card-body">
+            <div style="padding: 1.5rem;">
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Texto de la Pregunta *</label>
                     <input type="text" name="questions[${questionCount}][question_text]" required
@@ -133,7 +137,7 @@ function addQuestion() {
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="form-label fw-semibold mb-0">Opciones de Respuesta *</label>
-                        <button type="button" onclick="addOption(${questionCount})" class="btn btn-outline-primary btn-sm">
+                        <button type="button" onclick="addOption(${questionCount})" class="btn btn-sm" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%); color: #667eea; border: 1px solid rgba(102, 126, 234, 0.3); padding: 0.375rem 0.75rem; border-radius: 8px; font-weight: 500;">
                             <i class="bi bi-plus"></i> Agregar Opción
                         </button>
                     </div>
@@ -180,7 +184,7 @@ function addOption(questionIndex) {
                        class="form-control form-control-color"
                        value="#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}"
                        title="Elige un color para esta opción">
-                <button type="button" onclick="removeOption(this)" class="btn btn-outline-danger">
+                <button type="button" onclick="removeOption(this)" class="btn" style="background: linear-gradient(135deg, rgba(238, 9, 121, 0.15) 0%, rgba(255, 106, 0, 0.15) 100%); color: #ee0979; border: 1px solid rgba(238, 9, 121, 0.3);">
                     <i class="bi bi-x"></i>
                 </button>
             </div>

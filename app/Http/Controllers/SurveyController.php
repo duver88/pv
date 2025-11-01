@@ -196,7 +196,9 @@ class SurveyController extends Controller
     {
         $survey = Survey::where('public_slug', $publicSlug)
             ->with(['questions.options' => function($query) {
-                $query->withCount('votes');
+                $query->withCount(['votes' => function($q) {
+                    $q->valid();
+                }]);
             }])
             ->firstOrFail();
 
@@ -216,14 +218,16 @@ class SurveyController extends Controller
         $statistics = [];
 
         if ($showResults) {
-            // Calcular estadísticas generales
+            // Calcular estadísticas generales - Solo votos válidos
             $totalVotes = Vote::where('survey_id', $survey->id)
+                ->valid()
                 ->distinct('fingerprint')
                 ->count('fingerprint');
 
             // Si no hay votos por fingerprint, contar por IP
             if ($totalVotes == 0) {
                 $totalVotes = Vote::where('survey_id', $survey->id)
+                    ->valid()
                     ->distinct('ip_address')
                     ->count('ip_address');
             }
@@ -265,12 +269,15 @@ class SurveyController extends Controller
         $survey = Survey::where('public_slug', $publicSlug)
             ->where('is_finished', true)
             ->with(['questions.options' => function($query) {
-                $query->withCount('votes');
+                $query->withCount(['votes' => function($q) {
+                    $q->valid();
+                }]);
             }])
             ->firstOrFail();
 
-        // Calcular estadísticas generales
+        // Calcular estadísticas generales - Solo votos válidos
         $uniqueVoters = Vote::where('survey_id', $survey->id)
+            ->valid()
             ->distinct('ip_address')
             ->count('ip_address');
 

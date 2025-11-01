@@ -24,15 +24,15 @@ class QuestionOption extends Model
         return $this->hasMany(Vote::class);
     }
 
-    // Métodos útiles
+    // Métodos útiles - Solo contar votos válidos
     public function getVoteCountAttribute()
     {
-        return $this->votes()->count();
+        return $this->votes()->valid()->count();
     }
 
     public function getVotePercentageAttribute()
     {
-        $totalVotes = $this->question->votes()->count();
+        $totalVotes = $this->question->votes()->valid()->count();
         if ($totalVotes == 0) return 0;
         return round(($this->vote_count / $totalVotes) * 100, 2);
     }

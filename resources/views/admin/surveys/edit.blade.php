@@ -3,14 +3,16 @@
 @section('title', 'Editar Encuesta')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid px-0">
     <div class="mb-4">
-        <h1 class="h2 fw-bold">Editar Encuesta</h1>
-        <p class="text-muted">Actualiza la información de la encuesta</p>
+        <h1 class="h2 fw-bold mb-1" style="color: #1e293b;">
+            <i class="bi bi-pencil"></i> Editar Encuesta
+        </h1>
+        <p class="text-muted mb-0">Actualiza la información de la encuesta</p>
     </div>
 
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-4">
+    <div class="modern-card">
+        <div style="padding: 1.5rem;">
             <form method="POST" action="{{ route('admin.surveys.update', $survey) }}" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
@@ -194,7 +196,8 @@
 
                     <div id="new-questions-container"></div>
 
-                    <button type="button" class="btn btn-primary mt-3" onclick="addNewQuestion()">
+                    <button type="button" class="btn btn-sm mt-3" onclick="addNewQuestion()"
+                            style="background: linear-gradient(135deg, rgba(17, 153, 142, 0.15) 0%, rgba(56, 239, 125, 0.15) 100%); color: #11998e; border: 1px solid rgba(17, 153, 142, 0.3); padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
                         <i class="bi bi-plus-circle-fill"></i> Agregar Nueva Pregunta
                     </button>
 
@@ -215,10 +218,11 @@
 
                 <!-- Botones de acción -->
                 <div class="d-flex gap-2 justify-content-end mt-4">
-                    <a href="{{ route('admin.surveys.show', $survey) }}" class="btn btn-secondary">
+                    <a href="{{ route('admin.surveys.show', $survey) }}" class="btn btn-sm"
+                       style="background: #f1f5f9; color: #64748b; border: none; padding: 0.5rem 0.875rem; border-radius: 8px; font-weight: 500;">
                         <i class="bi bi-x-circle"></i> Cancelar
                     </a>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-sm btn-gradient-primary">
                         <i class="bi bi-check-circle"></i> Actualizar Encuesta
                     </button>
                 </div>
@@ -250,7 +254,7 @@ function addNewOption(questionIndex, currentOptionCount) {
                class="form-control form-control-color"
                value="#3b82f6"
                title="Elige un color para esta opción">
-        <button type="button" class="btn btn-danger" onclick="this.parentElement.remove(); renumberOptions(${questionIndex})">
+        <button type="button" class="btn" style="background: linear-gradient(135deg, rgba(238, 9, 121, 0.15) 0%, rgba(255, 106, 0, 0.15) 100%); color: #ee0979; border: 1px solid rgba(238, 9, 121, 0.3);" onclick="this.parentElement.remove(); renumberOptions(${questionIndex})">
             <i class="bi bi-trash"></i>
         </button>
     `;

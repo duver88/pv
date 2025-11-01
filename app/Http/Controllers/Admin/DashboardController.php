@@ -11,15 +11,15 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        // Solo contar votos que tienen survey_token_id (votos válidos con tokens)
+        // Solo contar votos válidos (con token o manuales)
         $surveys = Survey::withCount(['votes' => function ($query) {
-            $query->whereNotNull('survey_token_id');
+            $query->valid();
         }])->latest()->get();
 
         $totalSurveys = Survey::count();
         $activeSurveys = Survey::where('is_active', true)->count();
-        $totalVotes = Vote::whereNotNull('survey_token_id')->count();
-        $uniqueVoters = Vote::whereNotNull('survey_token_id')->distinct('fingerprint')->count();
+        $totalVotes = Vote::valid()->count();
+        $uniqueVoters = Vote::valid()->distinct('fingerprint')->count();
 
         return view('admin.dashboard', compact(
             'surveys',

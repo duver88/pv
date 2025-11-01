@@ -3,15 +3,15 @@
 @section('title', 'Gestión de Tokens - ' . $survey->title)
 
 @section('content')
-<div class="container-fluid px-4">
+<div class="container-fluid px-0">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3 mb-2">
-                <i class="bi bi-key-fill text-primary"></i> Gestión de Tokens
+            <h1 class="h3 fw-bold mb-1" style="color: #1e293b;">
+                <i class="bi bi-key-fill" style="color: #667eea;"></i> Gestión de Tokens
             </h1>
             <p class="text-muted mb-0">{{ $survey->title }}</p>
         </div>
-        <a href="{{ route('admin.surveys.show', $survey) }}" class="btn btn-secondary">
+        <a href="{{ route('admin.surveys.show', $survey) }}" class="btn" style="background: #f1f5f9; color: #64748b; border: none; padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 500;">
             <i class="bi bi-arrow-left"></i> Volver a la encuesta
         </a>
     </div>
@@ -31,56 +31,48 @@
     @endif
 
     <!-- Estadísticas Rápidas -->
-    <div class="row g-3 mb-4">
+    <div class="row g-4 mb-4">
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm bg-primary bg-gradient text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-1 opacity-75">Total Tokens</p>
-                            <h3 class="mb-0">{{ number_format($stats['total']) }}</h3>
-                        </div>
-                        <i class="bi bi-key-fill fs-1 opacity-50"></i>
-                    </div>
+            <div class="stat-card">
+                <div class="stat-icon stat-primary">
+                    <i class="bi bi-key-fill"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-1 small fw-medium text-uppercase" style="letter-spacing: 0.5px;">Total Tokens</p>
+                    <h3 class="mb-0 fw-bold" style="color: #1e293b;">{{ number_format($stats['total']) }}</h3>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm bg-warning bg-gradient text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-1 opacity-75">Pendientes</p>
-                            <h3 class="mb-0">{{ number_format($stats['pending']) }}</h3>
-                        </div>
-                        <i class="bi bi-clock-fill fs-1 opacity-50"></i>
-                    </div>
+            <div class="stat-card" style="--primary-gradient: var(--warning-gradient);">
+                <div class="stat-icon stat-warning">
+                    <i class="bi bi-clock-fill"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-1 small fw-medium text-uppercase" style="letter-spacing: 0.5px;">Pendientes</p>
+                    <h3 class="mb-0 fw-bold" style="color: #1e293b;">{{ number_format($stats['pending']) }}</h3>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm bg-success bg-gradient text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-1 opacity-75">Usados</p>
-                            <h3 class="mb-0">{{ number_format($stats['used']) }}</h3>
-                        </div>
-                        <i class="bi bi-check-circle-fill fs-1 opacity-50"></i>
-                    </div>
+            <div class="stat-card" style="--primary-gradient: var(--success-gradient);">
+                <div class="stat-icon stat-success">
+                    <i class="bi bi-check-circle-fill"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-1 small fw-medium text-uppercase" style="letter-spacing: 0.5px;">Usados</p>
+                    <h3 class="mb-0 fw-bold" style="color: #1e293b;">{{ number_format($stats['used']) }}</h3>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card border-0 shadow-sm bg-danger bg-gradient text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <p class="mb-1 opacity-75">Intentos Múltiples</p>
-                            <h3 class="mb-0">{{ number_format($stats['multiple_attempts']) }}</h3>
-                        </div>
-                        <i class="bi bi-exclamation-triangle-fill fs-1 opacity-50"></i>
-                    </div>
+            <div class="stat-card" style="--primary-gradient: var(--danger-gradient);">
+                <div class="stat-icon stat-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-1 small fw-medium text-uppercase" style="letter-spacing: 0.5px;">Intentos Múltiples</p>
+                    <h3 class="mb-0 fw-bold" style="color: #1e293b;">{{ number_format($stats['multiple_attempts']) }}</h3>
                 </div>
             </div>
         </div>
@@ -89,13 +81,11 @@
     <!-- URLs para Facebook Ads -->
     <div class="row g-3 mb-4">
         <div class="col-md-12">
-            <div class="card shadow-sm border-success">
-                <div class="card-header bg-success bg-opacity-10">
-                    <h5 class="mb-0">
-                        <i class="bi bi-facebook text-success"></i> URLs para Facebook Ads (Generación Automática)
-                    </h5>
-                </div>
-                <div class="card-body">
+            <div class="modern-card" style="border-left: 4px solid #11998e;">
+                <h5 class="mb-3 fw-bold" style="color: #1e293b;">
+                    <i class="bi bi-facebook" style="color: #11998e;"></i> URLs para Facebook Ads (Generación Automática)
+                </h5>
+                <div>
                     <p class="text-muted mb-3">
                         <i class="bi bi-lightbulb-fill text-warning"></i> <strong>Recomendado:</strong> Usa estas URLs en tus anuncios de Facebook. Cada persona que entre obtendrá automáticamente un token único.
                     </p>
@@ -165,8 +155,8 @@
                         <small class="text-muted">Personaliza <code>campaign_id=</code> con el nombre de tu campaña</small>
                     </div>
 
-                    <div class="alert alert-info mb-0">
-                        <i class="bi bi-info-circle-fill"></i>
+                    <div class="alert alert-info mb-0" style="background: linear-gradient(135deg, rgba(79, 172, 254, 0.1) 0%, rgba(0, 242, 254, 0.1) 100%); border-left: 4px solid #4facfe; border-radius: 12px;">
+                        <i class="bi bi-info-circle-fill" style="color: #4facfe;"></i>
                         <strong>¿Cómo funciona?</strong>
                         <ul class="mb-0 mt-2">
                             <li>Cada visitante que entre con estos links obtiene un <strong>token único automático</strong></li>
@@ -183,17 +173,15 @@
     <!-- Acciones -->
     <div class="row g-3 mb-4">
         <div class="col-md-12">
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="bi bi-gear-fill"></i> Acciones de Tokens
-                    </h5>
-                </div>
-                <div class="card-body">
+            <div class="modern-card">
+                <h5 class="mb-3 fw-bold" style="color: #1e293b;">
+                    <i class="bi bi-gear-fill" style="color: #667eea;"></i> Acciones de Tokens
+                </h5>
+                <div>
                     <div class="row g-3">
                         <!-- Generar Tokens -->
                         <div class="col-md-4">
-                            <button type="button" class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#generateTokensModal">
+                            <button type="button" class="btn btn-gradient-primary w-100" data-bs-toggle="modal" data-bs-target="#generateTokensModal">
                                 <i class="bi bi-plus-circle"></i> Generar Tokens Manualmente
                             </button>
                             <small class="text-muted d-block mt-2">Para QR codes, emails, etc.</small>
@@ -201,7 +189,7 @@
 
                         <!-- Exportar Tokens -->
                         <div class="col-md-4">
-                            <a href="{{ route('admin.surveys.tokens.export', $survey) }}" class="btn btn-success w-100">
+                            <a href="{{ route('admin.surveys.tokens.export', $survey) }}" class="btn w-100" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 12px rgba(17, 153, 142, 0.3);">
                                 <i class="bi bi-download"></i> Exportar Tokens Pendientes
                             </a>
                             <small class="text-muted d-block mt-2">Descarga archivo .txt con URLs</small>
@@ -209,7 +197,7 @@
 
                         <!-- Ver Analíticas -->
                         <div class="col-md-4">
-                            <a href="{{ route('admin.surveys.tokens.analytics', $survey) }}" class="btn btn-info w-100">
+                            <a href="{{ route('admin.surveys.tokens.analytics', $survey) }}" class="btn w-100" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 600; box-shadow: 0 4px 12px rgba(79, 172, 254, 0.3);">
                                 <i class="bi bi-bar-chart"></i> Ver Analíticas
                             </a>
                             <small class="text-muted d-block mt-2">Tokens por fuente y estado</small>
@@ -223,13 +211,11 @@
     <!-- Eliminación Masiva -->
     <div class="row g-3 mb-4">
         <div class="col-md-12">
-            <div class="card shadow-sm border-danger">
-                <div class="card-header bg-danger bg-opacity-10">
-                    <h6 class="mb-0">
-                        <i class="bi bi-trash-fill text-danger"></i> Eliminación Masiva
-                    </h6>
-                </div>
-                <div class="card-body">
+            <div class="modern-card" style="border-left: 4px solid #ee0979;">
+                <h6 class="mb-3 fw-bold" style="color: #1e293b;">
+                    <i class="bi bi-trash-fill" style="color: #ee0979;"></i> Eliminación Masiva
+                </h6>
+                <div>
                     <p class="text-muted mb-3">Eliminar tokens por estado. Esta acción no se puede deshacer.</p>
                     <div class="row g-2">
                         <div class="col-md-4">
@@ -266,26 +252,24 @@
     </div>
 
     <!-- Tabla de Tokens -->
-    <div class="card shadow-sm">
-        <div class="card-header">
-            <h5 class="mb-0">
-                <i class="bi bi-list-ul"></i> Lista de Tokens
-            </h5>
-        </div>
-        <div class="card-body p-0">
+    <div class="modern-card">
+        <h5 class="mb-4 fw-bold" style="color: #1e293b;">
+            <i class="bi bi-list-ul" style="color: #667eea;"></i> Lista de Tokens
+        </h5>
+        <div>
             @if($tokens->count() > 0)
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
+                        <thead style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
                             <tr>
-                                <th style="width: 300px;">Token</th>
-                                <th>Fuente</th>
-                                <th>Campaign ID</th>
-                                <th>Estado</th>
-                                <th>Intentos</th>
-                                <th>Usado</th>
-                                <th>Creado</th>
-                                <th class="text-center">Acciones</th>
+                                <th style="width: 300px; color: #475569; font-weight: 600; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">Token</th>
+                                <th style="color: #475569; font-weight: 600; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">Fuente</th>
+                                <th style="color: #475569; font-weight: 600; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">Campaign ID</th>
+                                <th style="color: #475569; font-weight: 600; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">Estado</th>
+                                <th style="color: #475569; font-weight: 600; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">Intentos</th>
+                                <th style="color: #475569; font-weight: 600; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">Usado</th>
+                                <th style="color: #475569; font-weight: 600; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">Creado</th>
+                                <th class="text-center" style="color: #475569; font-weight: 600; font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
