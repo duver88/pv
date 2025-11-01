@@ -20,7 +20,6 @@ return new class extends Migration
             $table->enum('status', ['pending', 'used', 'expired'])->default('pending');
             $table->timestamp('used_at')->nullable();
             $table->string('used_by_fingerprint')->nullable();
-            $table->ipAddress('ip_address')->nullable();
             $table->text('user_agent')->nullable();
             $table->integer('vote_attempts')->default(0);
             $table->timestamp('last_attempt_at')->nullable();

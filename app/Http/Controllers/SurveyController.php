@@ -35,6 +35,27 @@ class SurveyController extends Controller
             return view('surveys.inactive', compact('survey'));
         }
 
+        // OBLIGAR EL USO DE TOKENS: Si no hay token en la URL, redirigir a /t/{slug}
+        $tokenString = $request->query('token');
+        if (!$tokenString) {
+            return redirect()->route('token.redirect', $slug);
+        }
+
+        // Verificar que el token existe y obtener su estado
+        $tokenRecord = SurveyToken::where('token', $tokenString)
+            ->where('survey_id', $survey->id)
+            ->first();
+
+        // Si el token no existe, redirigir a /t/{slug} para generar uno nuevo
+        if (!$tokenRecord) {
+            return redirect()->route('token.redirect', $slug);
+        }
+
+        // Si el token ya fue usado, redirigir a página de agradecimiento
+        if ($tokenRecord->status === 'used') {
+            return redirect()->route('surveys.thanks', $survey->slug);
+        }
+
         // Verificar si ya votó (solo por fingerprint para permitir múltiples usuarios en la misma red)
         $fingerprint = $request->cookie('survey_fingerprint');
 
@@ -50,8 +71,8 @@ class SurveyController extends Controller
             return redirect()->route('surveys.thanks', $survey->slug);
         }
 
-        // Obtener token si existe en la URL
-        $token = $request->query('token');
+        // Pasar el token a la vista
+        $token = $tokenString;
 
         return view('surveys.show', compact('survey', 'hasVoted', 'token'));
     }
@@ -153,7 +174,6 @@ class SurveyController extends Controller
             if ($tokenRecord && $isValidToken) {
                 $tokenRecord->markAsUsed(
                     $fingerprint,
-                    $ipAddress,
                     $request->userAgent() ?? ''
                 );
             }

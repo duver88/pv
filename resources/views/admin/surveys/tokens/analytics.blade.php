@@ -125,7 +125,6 @@
                                 <th>Estado</th>
                                 <th>Primer Uso</th>
                                 <th>Último Intento</th>
-                                <th>IP</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -176,13 +175,6 @@
                                             <span class="text-muted">-</span>
                                         @endif
                                     </td>
-                                    <td>
-                                        @if($token->ip_address)
-                                            <code class="small">{{ $token->ip_address }}</code>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
-                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
@@ -227,7 +219,6 @@
                                 <th class="text-center">Estado</th>
                                 <th class="text-center">Intentos</th>
                                 <th>Último Intento</th>
-                                <th>IP</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -274,13 +265,6 @@
                                         </small>
                                         <br>
                                         <small class="text-muted">{{ $token->last_attempt_at->format('d/m/Y H:i') }}</small>
-                                    </td>
-                                    <td>
-                                        @if($token->ip_address)
-                                            <code class="small">{{ $token->ip_address }}</code>
-                                        @else
-                                            <span class="text-muted">-</span>
-                                        @endif
                                     </td>
                                 </tr>
                             @endforeach

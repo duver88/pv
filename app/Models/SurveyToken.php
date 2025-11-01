@@ -15,7 +15,6 @@ class SurveyToken extends Model
         'status',
         'used_at',
         'used_by_fingerprint',
-        'ip_address',
         'user_agent',
         'vote_attempts',
         'last_attempt_at'
@@ -41,13 +40,12 @@ class SurveyToken extends Model
         return $token;
     }
 
-    public function markAsUsed(string $fingerprint, string $ipAddress, string $userAgent): void
+    public function markAsUsed(string $fingerprint, string $userAgent): void
     {
         $this->update([
             'status' => 'used',
             'used_at' => now(),
             'used_by_fingerprint' => $fingerprint,
-            'ip_address' => $ipAddress,
             'user_agent' => $userAgent,
             'vote_attempts' => $this->vote_attempts + 1,
             'last_attempt_at' => now()

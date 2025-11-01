@@ -12,19 +12,13 @@ class TokenRedirectController extends Controller
     {
         $survey = Survey::where('slug', $slug)->firstOrFail();
 
-        // Si ya tiene un token en la URL, redirigir directamente a la encuesta
-        if ($request->has('token')) {
-            return redirect()->route('surveys.show', ['slug' => $slug, 'token' => $request->token]);
-        }
-
-        // Generar un nuevo token automáticamente
+        // SIEMPRE generar un nuevo token automáticamente (nunca reutilizar tokens existentes)
         $token = SurveyToken::create([
             'survey_id' => $survey->id,
             'token' => SurveyToken::generateToken(),
             'source' => $request->query('source', 'organic'),
             'campaign_id' => $request->query('campaign_id'),
             'status' => 'pending',
-            'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
         ]);
 
